@@ -1,0 +1,42 @@
+
+> vscode-gasd@1.0.0 test
+> node ./out/tests/runTest.js
+
+- Resolving version...
+✔ Validated version: 1.109.5
+✔ Found existing install in /Users/ming/Dev/gasd-vscode-extension/impl/.vscode-test/vscode-darwin-arm64-1.109.5
+[90m[main 2026-02-28T21:16:44.813Z][0m update#setState disabled
+[90m[main 2026-02-28T21:16:44.813Z][0m update#ctor - updates are disabled by the environment
+Started local extension host with pid 26697.
+Loading development extension at /Users/ming/Dev/gasd-vscode-extension/impl
+MCP Registry configured: https://api.mcp.github.com
+Settings Sync: Account status changed from uninitialized to unavailable
+Found 1 test files: [ 'extension.test.js' ]
+[0m[0m
+[0m  GASD Extension Test Suite[0m
+  [32m  ✔[0m[90m File association .gasd[0m
+  [31m  1) IntelliSense Suggestions[0m
+  [32m  ✔[0m[90m Real-time Diagnostics[0m
+  [32m  ✔[0m[90m Initialize Project Command[0m
+[92m [0m[32m 3 passing[0m[90m (115ms)[0m
+[31m  1 failing[0m
+[0m  1) GASD Extension Test Suite
+       IntelliSense Suggestions:
+
+      [31mAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(list.items.some(item => item.label === 'COMPONENT'))
+[0m
+      [32m+ expected[0m [31m- actual[0m
+
+      [31m-false[0m
+      [32m+true[0m
+      [0m[90m
+  	at Context.<anonymous> (out/tests/extension.test.js:58:16)
+[0m
+Error: 1 tests failed.
+	at /Users/ming/Dev/gasd-vscode-extension/impl/out/tests/index.js:59:27
+	at done (/Users/ming/Dev/gasd-vscode-extension/impl/node_modules/mocha/lib/mocha.js:1028:7)
+[90m[main 2026-02-28T21:16:45.679Z][0m Extension host with pid 26697 exited with code: 0, signal: unknown.
+Exit code:   1
+Failed to run tests

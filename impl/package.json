@@ -1,0 +1,72 @@
+{
+  "name": "vscode-gasd",
+  "displayName": "GASD Language Support",
+  "description": "Professional language support for General Agentic Software Design (GASD)",
+  "version": "1.0.0",
+  "publisher": "gasd-expert",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/General-Agentic-Software-Design/vscode-gasd.git"
+  },
+  "icon": "icons/gasd_icon.png",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./out/client/extension",
+  "contributes": {
+    "languages": [
+      {
+        "id": "gasd",
+        "aliases": [
+          "GASD",
+          "gasd"
+        ],
+        "extensions": [
+          ".gasd"
+        ],
+        "icon": {
+          "light": "icons/gasd_icon.png",
+          "dark": "icons/gasd_icon.png"
+        },
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gasd",
+        "scopeName": "source.gasd",
+        "path": "./client/gasd.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "gasd.initializeProject",
+        "title": "GASD: Initialize Project",
+        "category": "GASD"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "test": "node ./out/tests/runTest.js",
+    "package": "./package.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "@types/mocha": "^10.0.1",
+    "mocha": "^10.2.0",
+    "@vscode/test-electron": "^2.3.3",
+    "glob": "^11.1.0",
+    "typescript": "^5.0.0",
+    "vscode-languageclient": "^8.1.0",
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8"
+  }
+}

@@ -1,0 +1,16 @@
+# Source code
+**/*.ts
+**/*.ts.map
+tsconfig.json
+
+# Scripts and development files
+package.sh
+verify_lsp.js
+.vscode-test/
+
+# Documentation and meta
+.gitignore
+.gitattributes
+
+# Test source
+tests/

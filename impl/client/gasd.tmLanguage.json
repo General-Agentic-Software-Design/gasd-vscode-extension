@@ -1,0 +1,64 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "GASD",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#comments"
+        }
+    ],
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.gasd",
+                    "match": "\\b(CONTEXT|TARGET|TRACE|NAMESPACE|IMPORT|AS|DECISION|CHOSEN|RATIONALE|ALTERNATIVES|AFFECTS|TYPE|COMPONENT|PATTERN|DEPENDENCIES|INTERFACE|FLOW|VALIDATE|ENSURE|OTHERWISE|ACHIEVE|CREATE|PERSIST|TRANSFORM|RETURN|LOG|ON_ERROR|THROW|MATCH|DEFAULT|IF|ELSE|STRATEGY|ALGORITHM|PRECONDITION|COMPLEXITY|INPUT|OUTPUT|SORT_KEY|ORDER|ASCENDING|CONSTRAINT|INVARIANT|QUESTION|APPROVE|STATUS|BLOCKING|BY|DATE|NOTES|TODO|REVIEW|IS_SORTED)\\b"
+                },
+                {
+                    "name": "storage.type.gasd",
+                    "match": "\\b(String|Integer|Float|Decimal|Boolean|Bytes|UUID|DateTime|List|Map|Optional|Result|Enum|Any|Void)\\b"
+                },
+                {
+                    "name": "variable.language.gasd",
+                    "match": "@[a-zA-Z_]+"
+                }
+            ]
+        },
+        "strings": {
+            "name": "string.quoted.double.gasd",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.gasd",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.block.documentation.gasd",
+                    "begin": "\\/\\/\\/",
+                    "end": "$"
+                },
+                {
+                    "name": "comment.line.double-slash.gasd",
+                    "begin": "\\/\\/",
+                    "end": "$"
+                },
+                {
+                    "name": "comment.block.gasd",
+                    "begin": "\\/\\*",
+                    "end": "\\*\\/"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.gasd"
+}
