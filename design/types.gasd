@@ -8,9 +8,24 @@ CONTEXT: "VS Code Extension / LSP"
 TARGET: "TypeScript 5.x"
 TRACE: #US-5, #US-6, #US-7, #US-9, #US-19, #US-21, #US-22, #US-23
 
-NAMESPACE: "gasd.lsp.types"
+NAMESPACE: "gasd.vscode.design"
 
 /// Mandatory: All design primitives must adhere to expert patterns.
+TYPE Requirement:
+    name: String
+
+TYPE ExtensionContext:
+    extensionUri: String
+    storageUri: Optional<String>
+
+TYPE TextDocument:
+    uri: String
+    languageId: String
+    version: Integer
+
+/// Special type for methods that return no value.
+TYPE Void:
+    status: "Success"
 
 /// Represents a cursor position in a document.
 TYPE Position:
@@ -117,4 +132,4 @@ TYPE CallHierarchyItem:
 /// @trace #AC-4.1
 TYPE FormattingOptions:
     tabSize: Integer
-    insertSpaces: Boolean
+

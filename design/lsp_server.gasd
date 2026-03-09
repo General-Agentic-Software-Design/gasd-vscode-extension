@@ -1,12 +1,12 @@
 /* 
    --- GASD LSP Server Design (Expert Strict) ---
    Logic for language analysis, agentic interaction, and advanced LSP features.
-   Strictly follows GASD 1.0.0 normative specification:
+   Strictly follows GASD 1.1.0 normative specification:
    https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language
 */
 CONTEXT: "VS Code Extension / LSP"
 TARGET: "TypeScript 5.x"
-TRACE: #US-5 to #US-9, #US-13, #US-18, #US-19, #US-21, #US-22, #US-23, #US-25, #US-26
+TRACE: #US-5 to #US-9, #US-13, #US-18, #US-19, #US-21, #US-22, #US-23, #US-25, #US-26, #US-28
 
 IMPORT "types.gasd" AS Types
 
@@ -63,16 +63,17 @@ COMPONENT AgentService @trace #US-10, #US-13:
 
 /// Implements #US-9 (Diagnostics) & #US-18 (Code Actions)
 FLOW validate_document(uri: String, content: String):
-    @trace #AC-9.1, #AC-9.2, #AC-18.1
+    @trace #AC-9.1, #AC-9.2, #AC-18.1, #US-28
     1. ACHIEVE "Run Parser.parse(content)"
     2. MATCH result:
-        "PARSE_ERROR" -> 
+        "PARSE_ERROR" | "LEX_ERROR" -> 
             CREATE Types.Diagnostic:
                 message: "Syntax Error"
                 severity: ERROR
             ACHIEVE "Generate Quick Fixes for typos" @trace #AC-18.1
         "SUCCESS" -> 
-            VALIDATE "Directives (CONTEXT, TARGET) exist" @trace #AC-9.2
+            VALIDATE "Directives (CONTEXT, TARGET) exist" AS TYPE.Requirement @trace #AC-9.2
+            ON_ERROR: ACHIEVE "Report Missing Directives" @trace #AC-18.2
     3. PERSIST diagnostics via LSP connection
 
 /// Implements #US-13 (Human-in-the-Loop)
@@ -87,7 +88,7 @@ FLOW handle_agent_loop(question: String):
 FLOW provide_semantic_tokens(uri: String):
     @trace #AC-21.1
     1. ACHIEVE "Parser.get_semantic_tokens()"
-    2. RETURN EncodedTokens
+    2. RETURN TRANSFORM(tokens, @encode("LSP-Semantic-Tokens"))
 
 /// Implements #AC-5.4 (Spec-Correct Completion Casing)
 /// Completions MUST use textEdit (not insertText) to force EBNF-correct casing.

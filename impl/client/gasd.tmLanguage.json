@@ -6,6 +6,9 @@
             "include": "#keywords"
         },
         {
+            "include": "#literal_types"
+        },
+        {
             "include": "#strings"
         },
         {
@@ -17,7 +20,7 @@
             "patterns": [
                 {
                     "name": "keyword.control.gasd",
-                    "match": "\\b(CONTEXT|TARGET|TRACE|NAMESPACE|IMPORT|AS|DECISION|CHOSEN|RATIONALE|ALTERNATIVES|AFFECTS|TYPE|COMPONENT|PATTERN|DEPENDENCIES|INTERFACE|FLOW|VALIDATE|ENSURE|OTHERWISE|ACHIEVE|CREATE|PERSIST|TRANSFORM|RETURN|LOG|ON_ERROR|THROW|MATCH|DEFAULT|IF|ELSE|STRATEGY|ALGORITHM|PRECONDITION|COMPLEXITY|INPUT|OUTPUT|SORT_KEY|ORDER|ASCENDING|CONSTRAINT|INVARIANT|QUESTION|APPROVE|STATUS|BLOCKING|BY|DATE|NOTES|TODO|REVIEW|IS_SORTED)\\b"
+                    "match": "\\b(CONTEXT|TARGET|TRACE|NAMESPACE|IMPORT|AS|RESOURCES|DECISION|CHOSEN|RATIONALE|ALTERNATIVES|AFFECTS|TYPE|COMPONENT|PATTERN|DEPENDENCIES|INTERFACE|FLOW|VALIDATE|ENSURE|OTHERWISE|ACHIEVE|CREATE|PERSIST|TRANSFORM|RETURN|LOG|ON_ERROR|THROW|EXECUTE|UPDATE|APPLY|WITH|MATCH|DEFAULT|IF|ELSE|STRATEGY|ALGORITHM|PRECONDITION|COMPLEXITY|IS|NOT|AND|OR|INPUT|OUTPUT|SORT_KEY|ORDER|ASCENDING|CONSTRAINT|INVARIANT|QUESTION|APPROVE|STATUS|BLOCKING|BY|DATE|NOTES|TODO|REVIEW|IS_SORTED)\\b"
                 },
                 {
                     "name": "storage.type.gasd",
@@ -28,6 +31,10 @@
                     "match": "@[a-zA-Z_]+"
                 }
             ]
+        },
+        "literal_types": {
+            "name": "storage.type.literal.gasd",
+            "match": "(?<=:)\\s*(\"[^\"]*\")"
         },
         "strings": {
             "name": "string.quoted.double.gasd",

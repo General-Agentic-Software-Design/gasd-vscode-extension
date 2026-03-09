@@ -2,7 +2,7 @@
   "name": "vscode-gasd",
   "displayName": "GASD Language Support",
   "description": "Professional language support for General Agentic Software Design (GASD)",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "publisher": "gasd-expert",
   "license": "MIT",
   "repository": {
@@ -17,6 +17,9 @@
     "Programming Languages"
   ],
   "main": "./out/client/extension",
+  "activationEvents": [
+    "onLanguage:gasd"
+  ],
   "contributes": {
     "languages": [
       {

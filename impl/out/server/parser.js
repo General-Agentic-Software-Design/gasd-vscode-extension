@@ -29,7 +29,7 @@ class Parser {
         // GASD keywords per GASD 1.0.0 spec (§3-§11)
         const keywords = [
             // Directives (§3)
-            'CONTEXT', 'TARGET', 'TRACE', 'NAMESPACE', 'IMPORT', 'AS',
+            'CONTEXT', 'TARGET', 'TRACE', 'NAMESPACE', 'IMPORT', 'AS', 'RESOURCES',
             // Decisions (§4)
             'DECISION', 'CHOSEN', 'RATIONALE', 'ALTERNATIVES', 'AFFECTS',
             // Types (§5)
@@ -39,12 +39,15 @@ class Parser {
             // Flows (§7)
             'FLOW', 'VALIDATE', 'ENSURE', 'OTHERWISE', 'ACHIEVE', 'CREATE',
             'PERSIST', 'TRANSFORM', 'RETURN', 'LOG', 'ON_ERROR', 'THROW',
+            'EXECUTE', 'UPDATE', 'APPLY', 'WITH',
             // Pattern matching (§11)
             'MATCH', 'DEFAULT',
             // Control flow (§7 EBNF)
             'IF', 'ELSE',
             // Strategy (§8)
             'STRATEGY', 'ALGORITHM', 'PRECONDITION', 'COMPLEXITY',
+            // Logic (§7 GEP-4)
+            'IS', 'NOT', 'AND', 'OR',
             'INPUT', 'OUTPUT', 'SORT_KEY', 'ORDER', 'ASCENDING',
             // Constraints (§9)
             'CONSTRAINT', 'INVARIANT',

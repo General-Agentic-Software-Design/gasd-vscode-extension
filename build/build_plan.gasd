@@ -1,88 +1,101 @@
 /* 
    --- Build Plan: GASD VS Code Extension ---
    Expert implementation of building and testing the official GASD extension.
-   Strictly follows GASD 1.0.0 normative specification:
+   Strictly follows GASD 1.1.0 normative specification:
    https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language
 */
+
 CONTEXT: "VS Code Extension Development"
 TARGET: "TypeScript 5.x", "VS Code API ^1.80.0"
+TRACE: #US-1 to #US-28
 
-// --- 1. Architectural Decisions ---
+// ===================================================================
+// 0. Standard & Global Definitions
+// ===================================================================
+TYPE Requirement:
+    name: String
 
-DECISION "Agent Knowledge Level":
-    CHOSEN: "GASD Expert (Strict)"
-    RATIONALE: "Ensures that all generated designs and implementation code adhere strictly to the GASD 1.0.0 normative specification"
-    AFFECTS: [Agent.generation_logic, Agent.validation_logic]
+// ===================================================================
+// PHASE 1 — Design (Output: design/ folder)
+// Generate design-level GASD specifications strictly from requirements.
+// ===================================================================
 
-DECISION "Communication Protocol":
-    CHOSEN: "LSP (Language Server Protocol)"
-    RATIONALE: "Decouples language logic from UI, allows reuse in other IDEs"
-    AFFECTS: [ExtensionClient, GASDServer]
+FLOW phase1_generate_designs():
+    1. ACHIEVE "Read Requirments/user-story.md"
+    2. ACHIEVE "Read Requirments/gasd-1.1-user-story.md"
+    3. ENSURE "All #US and #AC IDs are extracted"
+    4. ACHIEVE "Generate design/types.gasd" @trace #US-28
+    5. ACHIEVE "Generate design/vscode_gasd_extension.gasd" @trace #US-15, #US-27, #US-28
+    6. ACHIEVE "Generate design/lsp_server.gasd" @trace #US-5 to #US-9, #US-28
+    7. ACHIEVE "Generate design/extension_client.gasd" @trace #US-1, #US-15, #US-27, #US-28
+    8. ACHIEVE "Generate design/tests.gasd" @trace #US-1 to #US-28
+    9. ENSURE "All AC IDs are traced in design files"
 
-DECISION "AI Backend Interface":
-    CHOSEN: "Standardized JSON-over-HTTP"
-    RATIONALE: "Language-agnostic connection to agentic backends"
-    AFFECTS: [GASDServer.agent_service]
+
+// ===================================================================
+// PHASE 2 — Validation Specifications (Output: Validation/ folder)
+// Generate explicit, comprehensive GASD test cases strictly based on the Design/ folder.
+// ===================================================================
+
+FLOW phase2_generate_validation_specs():
+    1. ACHIEVE "Generate Validation/extension_client_tests.gasd from Design/extension_client.gasd"
+    2. ACHIEVE "Generate Validation/lsp_server_tests.gasd from Design/lsp_server.gasd"
+    3. ACHIEVE "Generate Validation/vscode_gasd_extension_tests.gasd from Design/vscode_gasd_extension.gasd"
+    4. ACHIEVE "Generate Validation/types_tests.gasd from Design/types.gasd"
+    5. ACHIEVE "Generate Validation/tests_tests.gasd from Design/tests.gasd"
+    6. ENSURE "Validation specs cover all constraints and type definitions present in the Design folder"
 
 
-DECISION "Parsing Strategy":
-    CHOSEN: "Nearley.js"
-    RATIONALE: "Formal EBNF support for strict GASD grammar compliance"
-    AFFECTS: [GASDServer.parser]
+// ===================================================================
+// PHASE 3 — Testing (Output: Impl/tests/ folder)
+// Generate all acceptance and regression tests, then run to pass.
+// ===================================================================
 
-// --- 2. Build & Test Flows ---
+FLOW phase3_run_tests():
+    @trace #US-1 to #US-28
+    1. ACHIEVE "Review Requirements/, Validation/ and Design/ for testing scope"
+    2. ACHIEVE "Generate Acceptance Tests"
+    3. ACHIEVE "Generate Regression Tests"
+    4. ACHIEVE "Generate Negative Tests"
+    5. ACHIEVE "Generate Design Validation Tests"
+    6. ACHIEVE "Run Extension Integration Tests (Mocha)"
+    7. ACHIEVE "Run LSP Server Unit Tests"
+    8. ACHIEVE "Run Acceptance Tests (Playwright-VSCode)" @trace #AC-5.1, #AC-27.1, #US-28
+    9. ACHIEVE "Run Regression Tests"
+    10. ACHIEVE "Run Negative Tests"
+    11. ACHIEVE "Run Design Validation Tests"
+    12. ENSURE "All Quality Gates Met and fixing implementation till All tests pass"
+       OTHERWISE THROW "Build Failure: Tests Failed"
 
-FLOW initialize_environment():
-    1. VALIDATE "Node.js >= 18.0.0"
-    2. ACHIEVE "Scaffold Extension Project":
-        tool: "yo code"
-        template: "typescript"
-    3. CREATE "Project Structure":
-        folders: ["design", "user-story", "tests", "impl"]
-    4. PERSIST configuration via "impl/package.json"
 
-/// Quality Gate: All tests must pass before any packaging occurs.
-FLOW run_to_pass():
-    1. ACHIEVE "Run Unit Tests"
-    2. ACHIEVE "Run Integration Tests"
-    3. ACHIEVE "Run Acceptance Tests"
-    4. ENSURE "All tests passed"
-        OTHERWISE THROW "Build Failure: Quality Gates Not Met"
+// ===================================================================
+// PHASE 4 — Implementation (Output: src/ and out/ folders)
+// Generate production code from Phase 1 designs.
+// ===================================================================
 
-/// Acceptance Tests mapping to User Story Criteria
-FLOW acceptance_test():
-    @trace #US-1, #US-5, #US-14, #US-18, #US-19, #US-27
-    1. ACHIEVE "Open folder containing .gasd file"
-    2. VALIDATE "File is recognized as GASD language" @trace #AC-27.1
-    3. VALIDATE "Syntax Highlighting applied" @trace #AC-1.1
-    3. ACHIEVE "Trigger IntelliSense at Position(10, 5)" @trace #AC-5.1
-    4. ENSURE "Suggestions include 'COMPONENT'" @trace #AC-5.2
-    5. ACHIEVE "Run 'Visualize Flow' command" @trace #AC-14.1
-    6. VALIDATE "Webview panel opens with Mermaid diagram"
-    7. ACHIEVE "Check Outline View" @trace #AC-19.1
-    8. VALIDATE "Symbols are correctly nested"
-    9. ACHIEVE "Trigger Quick Fix on Type Error" @trace #AC-18.1
-    10. VALIDATE "Correct type is suggested"
+FLOW phase4_generate_implementation():
+    1. ACHIEVE "Compile TypeScript (tsc -b)"
+    2. ACHIEVE "out/ directory is correctly populated" AS TYPE.Requirement
+    3. ACHIEVE "Verify Extension Activation"
+    4. LOG "Implementation verified and ready for packaging"
 
-FLOW generate_design():
-    /// Requirement: Always read user stories first to ensure 100% coverage and traceability.
-    1. ACHIEVE "Read user-story/user-story.md"
-    2. VALIDATE "All #US and #AC IDs are extracted"
-    3. ACHIEVE "Generate Design Files (.gasd)":
-        target: "design/"
-        compliance: "Strict GASD Expert"
-    4. PERSIST "Update design/vscode_gasd_extension.gasd with new @trace links"
 
-FLOW package_extension():
-    @trace #US-15
-    1. ACHIEVE "Run compile (tsc -b)"
-    2. VALIDATE "out/ directory is populated"
-    3. EXECUTE "npx @vscode/vsce package"
-    4. VERIFY "build/installation/vscode-gasd-1.0.0.vsix is created"
-    5. LOG "Extension packaged successfully for installation"
+// ===================================================================
+// PHASE 5 — Packaging (Output: build/installation/ folder)
+// Package the extension as a VSIX.
+// ===================================================================
 
-// --- 3. Constraints ---
+FLOW phase5_package_extension():
+    @trace #US-15, #US-28
+    1. ACHIEVE "Clean build/installation/ directory"
+    2. ACHIEVE "vsce package --out build/installation/vscode-gasd-1.1.1.vsix"
+    3. ENSURE "VSIX package contains all resources (icons, grammars, snippets)"
+    4. LOG "GASD Extension 1.1.1 packaged successfully"
+
+// ===================================================================
+// 3. Constraints
+// ===================================================================
 CONSTRAINT: "The extension must load in less than 500ms"
 CONSTRAINT: "Syntax highlighting must be implemented via TextMate grammar"
 CONSTRAINT: "Zero-dependency installation: VSIX must be self-contained"
-CONSTRAINT: "Agent Compliance: Any agent-generated GASD or implementation code MUST strictly follow the GASD expert patterns and EBNF grammar."
+CONSTRAINT: "Agent Compliance: Generated code MUST follow GASD expert patterns." @trace #US-28

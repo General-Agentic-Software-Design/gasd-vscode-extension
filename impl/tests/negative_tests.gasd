@@ -1,0 +1,28 @@
+/* 
+   --- Negative Test Suite: GASD 1.1 ---
+   Verifies robust error handling and constraint enforcement.
+   Focus: Mandatory Binding, Literal mismatch.
+*/
+CONTEXT: "VS Code Extension Testing"
+TARGET: "TypeScript (Mocha)"
+TRACE: #US-28, #AC-28.15, #AC-28.3
+
+IMPORT "design/types.gasd" AS Types
+
+NAMESPACE: "gasd.vscode.tests.negative"
+
+TYPE ErrorInfo:
+    code: String
+    message: String
+
+FLOW verify_missing_validate_binding:
+    ACHIEVE "Open file with 'VALIDATE result AS TYPE.Missing' (Implicitly bound)"
+    ENSURE "Error reported: VALIDATE must use AS TYPE.X" @trace #AC-28.15
+
+FLOW verify_literal_type_violation:
+    ACHIEVE "Open file with 'status: \"Failure\"' where type is 'status: \"Success\"'"
+    ENSURE "Error reported: Literal mismatch" @trace #AC-28.3
+
+FLOW run_negative_suite:
+    ACHIEVE "Invoke verify_missing_validate_binding"
+    ACHIEVE "Invoke verify_literal_type_violation"

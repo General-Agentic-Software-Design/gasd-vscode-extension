@@ -156,6 +156,10 @@ connection.onCompletion((textDocumentPosition) => {
         kw('LOG', 'Log a message'),
         kw('ON_ERROR:', 'Error handling directive'),
         kw('THROW', 'Throw an exception'),
+        kw('EXECUTE', 'Low-level execution (impl by dev)'),
+        kw('UPDATE', 'Modify a persisted resource'),
+        kw('APPLY', 'Apply a transformation or pattern'),
+        kw('WITH', 'Provision a resource or context'),
         // === Pattern matching template (Spec §11) ===
         snippet('MATCH', 'Pattern matching block', 'MATCH ${1:expression}:\n    "${2:pattern}" -> ${3:action}\n    DEFAULT -> ${4:action}\n'),
         // === Control flow (Spec §7 EBNF) ===
@@ -246,7 +250,7 @@ connection.onDocumentSymbol((params) => {
 /** @trace #AC-4.3 — auto-correct keywords on type (GASD 1.0.0 spec) */
 const GASD_KEYWORDS = [
     // Directives (§3)
-    'CONTEXT', 'TARGET', 'TRACE', 'NAMESPACE', 'IMPORT', 'AS',
+    'CONTEXT', 'TARGET', 'TRACE', 'NAMESPACE', 'IMPORT', 'AS', 'RESOURCES',
     // Decisions (§4)
     'DECISION', 'CHOSEN', 'RATIONALE', 'ALTERNATIVES', 'AFFECTS',
     // Types (§5)
@@ -256,12 +260,15 @@ const GASD_KEYWORDS = [
     // Flows (§7)
     'FLOW', 'VALIDATE', 'ENSURE', 'OTHERWISE', 'ACHIEVE', 'CREATE',
     'PERSIST', 'TRANSFORM', 'RETURN', 'LOG', 'ON_ERROR', 'THROW',
+    'EXECUTE', 'UPDATE', 'APPLY', 'WITH',
     // Pattern matching (§11)
     'MATCH', 'DEFAULT',
     // Control flow (§7 EBNF)
     'IF', 'ELSE',
     // Strategy (§8)
     'STRATEGY', 'ALGORITHM', 'PRECONDITION', 'COMPLEXITY',
+    // Logic (§7 GEP-4)
+    'IS', 'NOT', 'AND', 'OR',
     'INPUT', 'OUTPUT', 'SORT_KEY', 'ORDER', 'ASCENDING',
     // Constraints (§9)
     'CONSTRAINT', 'INVARIANT',

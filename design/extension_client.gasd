@@ -1,16 +1,30 @@
 /* 
    --- Extension Client Design (Expert Strict) ---
    Logic for VS Code host interaction and workspace management.
-   Strictly follows GASD 1.0.0 normative specification:
+   Strictly follows GASD 1.1.0 normative specification:
    https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language
 */
 CONTEXT: "VS Code Extension"
 TARGET: "TypeScript 5.x"
-TRACE: #US-1, #US-15, #US-16, #US-27
+TRACE: #US-1, #US-15, #US-16, #US-27, #US-28
 
-IMPORT "types.gasd" AS Types
+// --- Core Types ---
+TYPE Requirement:
+    name: String
 
-NAMESPACE: "gasd.vscode.client"
+TYPE Void:
+    status: "Success"
+
+TYPE ExtensionContext:
+    extensionUri: String
+    storageUri: Optional<String>
+
+TYPE TextDocument:
+    uri: String
+    languageId: String
+    version: Integer
+
+NAMESPACE: "gasd.vscode.design"
 
 COMPONENT ExtensionClient @trace #US-15, #US-27:
     PATTERN: "VS Code Extension Entry Point"
@@ -42,8 +56,8 @@ COMPONENT ProjectManager @trace #US-15, #US-16:
 
 /// Implements #US-15 (Project Scaffolding)
 FLOW initialize_gasd_project():
-    @trace #AC-15.1
-    1. VALIDATE "Workspace is open"
+    @trace #AC-15.1, #US-28
+    1. VALIDATE "Workspace is open" AS TYPE.Requirement
     2. CREATE "build/" directory
     3. CREATE "design/" directory
     4. CREATE "user-story/" directory
@@ -67,7 +81,7 @@ FLOW handle_gasd_file_open(uri: String):
 FLOW apply_theming():
     @trace #AC-1.1 to #AC-1.6
     1. ACHIEVE "Load gasd.tmLanguage.json"
-    2. VALIDATE "Directives, keywords, and types are mapped to standard scopes"
+    2. VALIDATE "Directives, keywords, and types are mapped to standard scopes" AS TYPE.Requirement
     3. ACHIEVE "Apply semantic token mapping" @trace #US-21
 
 // --- Constraints ---

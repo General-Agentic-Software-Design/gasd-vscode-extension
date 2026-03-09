@@ -1,12 +1,12 @@
 /* 
    --- GASD VS Code Extension Design (Orchestrator) ---
    Main orchestrator for the official extension.
-   Strictly follows GASD 1.0.0 normative specification as an expert:
+   Strictly follows GASD 1.1.0 normative specification as an expert:
    https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language
 */
 CONTEXT: "VS Code Extension / LSP"
 TARGET: "TypeScript 5.x"
-TRACE: #US-1 to #US-27
+TRACE: #US-1 to #US-28
 
 IMPORT "types.gasd" AS Types
 IMPORT "lsp_server.gasd" AS Server
@@ -17,7 +17,7 @@ NAMESPACE: "gasd.vscode.main"
 
 /// Expert Pattern: Use a single orchestrator to manage lifecycle and components.
 
-COMPONENT GASDExtension @trace #US-1 to #US-27:
+COMPONENT GASDExtension @trace #US-15, #US-27, #US-28:
     PATTERN: "Extension Entry Point"
     DEPENDENCIES: [
         Client.ExtensionClient,
@@ -28,8 +28,8 @@ COMPONENT GASDExtension @trace #US-1 to #US-27:
     RESOURCES:
         - "language-configuration.json"
         - "client/gasd.tmLanguage.json"
-        - "snippets/gasd.code-snippets"  // @trace #US-2
-        - "icons/gasd_icon.png"  // @trace #AC-27.2 actively used as language file logo
+        - "snippets/gasd.code-snippets" @trace #US-2
+        - "icons/gasd_icon.png" @trace #AC-27.2 // @trace #AC-28.11 (GEP-4 Resource Spec)
 
     INTERFACE:
         on_startup() -> Void
@@ -40,14 +40,18 @@ COMPONENT GASDExtension @trace #US-1 to #US-27:
 DECISION "Process Model":
     CHOSEN: "Multi-process (Client Main + Server Thread)"
     RATIONALE: "Ensures responsiveness by offloading parsing and AI tasks"
-    AFFECTS: [GASDExtension.Server]
+    ALTERNATIVES: ["Single-process", "Web Worker-based"]
+    AFFECTS: [Server.GASDServer]
 
 DECISION "Strict Compliance Enforcement":
-    CHOSEN: "Normative GASD 1.0.0 Validation"
+    CHOSEN: "Normative GASD 1.1.0 Validation"
     RATIONALE: "Enforces expert-level patterns across all generated artifacts"
+    ALTERNATIVES: ["Loose Validation", "Warning-only mode"]
     AFFECTS: [Server.Parser]
 
 // --- Global Invariants ---
 INVARIANT: "Expert Compliance: All components MUST trace back to #US or #AC identifiers."
 INVARIANT: "LSP 3.17 compliance for all core features." @trace #US-18 to #US-26
-INVARIANT: "Story-First Methodology: Design MUST be derived directly from user-story.md." @trace #US-27
+INVARIANT: "Expert Compliance: Design MUST be derived directly from user-story.md and gasd-1.1-user-story.md." @trace #US-27, #US-28
+INVARIANT: "GEP-3/4 Compliance: All flow logic MUST use formalized keywords and permissive math expressions." @trace #AC-28.4 to #AC-28.12
+INVARIANT: "GEP-5 Compliance: All VALIDATE steps MUST use explicit AS TYPE binding." @trace #AC-28.13

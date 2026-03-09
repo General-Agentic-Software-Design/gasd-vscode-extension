@@ -1,1 +1,7 @@
 .DS_Store
+agent.md
+.vscode-test
+.vscode-test-web
+out
+node_modules
+.npm
