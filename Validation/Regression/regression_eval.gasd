@@ -1,0 +1,30 @@
+VERSION 1.2
+/* 
+   --- Validation Spec: Regression Compatibility ---
+   Validates backward compatibility guarantees.
+*/
+CONTEXT: "VS Code Extension Validation"
+TARGET: "Mocha"
+TRACE: "#US-40"
+
+NAMESPACE: "gasd.vscode.validation.regression"
+
+TYPE Requirement:
+    name: String
+
+COMPONENT RegressionValidator:
+    PATTERN: "Backwards Compatibility Validator"
+    INTERFACE:
+        validate_compatibility() -> Boolean
+
+FLOW validate_regression_suite():
+    @trace("#US-40") AS TR_REG_VAL
+    1. ACHIEVE "Load GASD 1.1 file without VERSION directive"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Run gasd parser in 1.2 mode"
+        POSTCONDITION: result != null
+    3. VALIDATE "Missing POSTCONDITIONs produce only warnings, not errors" AS TYPE.Requirement
+    4. VALIDATE "Annotations without AS identifiers log warnings, not syntax errors" AS TYPE.Requirement
+    5. ACHIEVE "Assert parsing terminates gracefully on all 1.1 designs"
+        POSTCONDITION: result != null
+    6. RETURN "Success"

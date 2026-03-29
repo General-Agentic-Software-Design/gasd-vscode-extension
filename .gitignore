@@ -2,3 +2,8 @@
 agent.md
 .vscode-test
 .vscode-test-web
+Requirments/GASD-Specs/GASD-1.1
+Requirments/gasd-1.1-user-story.md
+Requirments/user-story.md
+build/installation/vscode-gasd-1.0.0.vsix
+build/installation/vscode-gasd-1.1.1.vsix'

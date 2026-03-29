@@ -39,8 +39,21 @@ To create a `.vsix` installer for your extension:
 3. Install the generated bundle:
 
     ```bash
-    code --install-extension build/installation/vscode-gasd-1.0.0.vsix
+    code --install-extension build/installation/vscode-gasd-1.2.0.vsix
     ```
+
+## 🌟 What's New in 1.2.0 (GEP-6)
+
+GASD 1.2.0 introduces formal semantics and contract modeling for machine-verifiable designs.
+
+- **Spec Versioning**: Explicitly target the 1.2 standard with the `VERSION 1.2` directive.
+- **Formal Postconditions**: `ACHIEVE` steps now require `POSTCONDITION` blocks for automated testing.
+- **Interface Contracts**: Define behavioral `CONTRACT` blocks for component interfaces and `IMPORT` boundaries.
+- **Step Dependency Tracking**: Explicitly declare execution order with `DEPENDS_ON STEP`.
+- **Scoped Invariants**: Distinguish between `LOCAL` component rules and `GLOBAL` system invariants.
+- **Stable Identifiers**: Assign persistent `AS` identifiers to all annotations for consistent traceability.
+- **Enhanced Linting**: 12 new normative diagnostic rules for architectural consistency.
+- **Backward Compatibility**: Full support for GASD 1.1 projects (legacy files remain fully functional).
 
 ## 🚀 Live Demo (Extension Development Host)
 

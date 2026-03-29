@@ -2,12 +2,12 @@
   "name": "vscode-gasd",
   "displayName": "GASD Language Support",
   "description": "Professional language support for General Agentic Software Design (GASD)",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "publisher": "gasd-expert",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/General-Agentic-Software-Design/vscode-gasd.git"
+    "url": "git+https://github.com/General-Agentic-Software-Design/vscode-gasd.git"
   },
   "icon": "icons/gasd_icon.png",
   "engines": {
@@ -16,9 +16,16 @@
   "categories": [
     "Programming Languages"
   ],
-  "main": "./out/client/extension",
+  "main": "./out/src/client/extension",
   "activationEvents": [
-    "onLanguage:gasd"
+    "onLanguage:gasd",
+    "onCommand:gasd.initializeProject",
+    "onCommand:gasd.generateDesign",
+    "onCommand:gasd.validateDesign",
+    "onCommand:gasd.showPreview",
+    "onCommand:gasd.requestReview",
+    "onCommand:gasd.showStrategyVis",
+    "onCommand:gasd.checkConsistency"
   ],
   "contributes": {
     "languages": [
@@ -50,26 +57,174 @@
         "command": "gasd.initializeProject",
         "title": "GASD: Initialize Project",
         "category": "GASD"
+      },
+      {
+        "command": "gasd.generateDesign",
+        "title": "GASD: Generate Design",
+        "category": "GASD"
+      },
+      {
+        "command": "gasd.validateDesign",
+        "title": "GASD: Validate Design",
+        "category": "GASD"
+      },
+      {
+        "command": "gasd.showPreview",
+        "title": "GASD: Show Preview",
+        "category": "GASD"
+      },
+      {
+        "command": "gasd.requestReview",
+        "title": "GASD: Request Review",
+        "category": "GASD"
+      },
+      {
+        "command": "gasd.showStrategyVis",
+        "title": "GASD: Show Strategy Visualization",
+        "category": "GASD"
+      },
+      {
+        "command": "gasd.checkConsistency",
+        "title": "GASD: Check Consistency",
+        "category": "GASD"
       }
     ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -b",
+    "compile": "tsc -p ./",
     "watch": "tsc -b -w",
     "test": "node ./out/tests/runTest.js",
     "package": "./package.sh"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^18.19.130",
     "@types/vscode": "^1.80.0",
-    "@types/mocha": "^10.0.1",
-    "mocha": "^10.2.0",
-    "@vscode/test-electron": "^2.3.3",
+    "@vscode/test-electron": "^2.5.2",
     "glob": "^11.1.0",
-    "typescript": "^5.0.0",
+    "mocha": "^10.8.2",
+    "typescript": "^5.9.3",
     "vscode-languageclient": "^8.1.0",
     "vscode-languageserver": "^8.1.0",
-    "vscode-languageserver-textdocument": "^1.0.8"
-  }
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "agent-base": "^7.1.4",
+    "ansi-colors": "^4.1.3",
+    "ansi-regex": "^6.2.2",
+    "anymatch": "^3.1.3",
+    "argparse": "^2.0.1",
+    "balanced-match": "^1.0.2",
+    "binary-extensions": "^2.3.0",
+    "brace-expansion": "^2.0.2",
+    "braces": "^3.0.3",
+    "browser-stdout": "^1.3.1",
+    "camelcase": "^6.3.0",
+    "chalk": "^5.6.2",
+    "chokidar": "^3.6.0",
+    "cli-cursor": "^5.0.0",
+    "cli-spinners": "^2.9.2",
+    "cliui": "^7.0.4",
+    "color-convert": "^2.0.1",
+    "color-name": "^1.1.4",
+    "core-util-is": "^1.0.3",
+    "cross-spawn": "^7.0.6",
+    "debug": "^4.4.3",
+    "decamelize": "^4.0.0",
+    "diff": "^5.2.2",
+    "escalade": "^3.2.0",
+    "escape-string-regexp": "^4.0.0",
+    "fill-range": "^7.1.1",
+    "find-up": "^5.0.0",
+    "flat": "^5.0.2",
+    "foreground-child": "^3.3.1",
+    "fs.realpath": "^1.0.0",
+    "fsevents": "^2.3.3",
+    "get-caller-file": "^2.0.5",
+    "get-east-asian-width": "^1.5.0",
+    "glob-parent": "^5.1.2",
+    "has-flag": "^4.0.0",
+    "he": "^1.2.0",
+    "http-proxy-agent": "^7.0.2",
+    "https-proxy-agent": "^7.0.6",
+    "immediate": "^3.0.6",
+    "inflight": "^1.0.6",
+    "inherits": "^2.0.4",
+    "is-binary-path": "^2.1.0",
+    "is-extglob": "^2.1.1",
+    "is-fullwidth-code-point": "^3.0.0",
+    "is-glob": "^4.0.3",
+    "is-interactive": "^2.0.0",
+    "is-number": "^7.0.0",
+    "is-plain-obj": "^2.1.0",
+    "is-unicode-supported": "^2.1.0",
+    "isarray": "^1.0.0",
+    "isexe": "^2.0.0",
+    "jackspeak": "^4.2.3",
+    "js-yaml": "^4.1.1",
+    "jszip": "^3.10.1",
+    "lie": "^3.3.0",
+    "locate-path": "^6.0.0",
+    "log-symbols": "^6.0.0",
+    "lru-cache": "^11.2.6",
+    "mimic-function": "^5.0.1",
+    "minimatch": "^5.1.9",
+    "minipass": "^7.1.3",
+    "ms": "^2.1.3",
+    "normalize-path": "^3.0.0",
+    "once": "^1.4.0",
+    "onetime": "^7.0.0",
+    "ora": "^8.2.0",
+    "p-limit": "^3.1.0",
+    "p-locate": "^5.0.0",
+    "package-json-from-dist": "^1.0.1",
+    "pako": "^1.0.11",
+    "path-exists": "^4.0.0",
+    "path-key": "^3.1.1",
+    "path-scurry": "^2.0.2",
+    "picomatch": "^2.3.1",
+    "process-nextick-args": "^2.0.1",
+    "randombytes": "^2.1.0",
+    "readable-stream": "^2.3.8",
+    "readdirp": "^3.6.0",
+    "require-directory": "^2.1.1",
+    "restore-cursor": "^5.1.0",
+    "safe-buffer": "^5.1.2",
+    "semver": "^7.7.4",
+    "serialize-javascript": "^6.0.2",
+    "setimmediate": "^1.0.5",
+    "shebang-command": "^2.0.0",
+    "shebang-regex": "^3.0.0",
+    "signal-exit": "^4.1.0",
+    "stdin-discarder": "^0.2.2",
+    "string_decoder": "^1.1.1",
+    "strip-ansi": "^7.2.0",
+    "strip-json-comments": "^3.1.1",
+    "supports-color": "^8.1.1",
+    "to-regex-range": "^5.0.1",
+    "undici-types": "^5.26.5",
+    "util-deprecate": "^1.0.2",
+    "vscode-jsonrpc": "^8.1.0",
+    "vscode-languageserver-protocol": "^3.17.3",
+    "vscode-languageserver-types": "^3.17.3",
+    "which": "^2.0.2",
+    "workerpool": "^6.5.1",
+    "wrappy": "^1.0.2",
+    "y18n": "^5.0.8",
+    "yargs": "^16.2.0",
+    "yargs-parser": "^20.2.9",
+    "yargs-unparser": "^2.0.0",
+    "yocto-queue": "^0.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/General-Agentic-Software-Design/vscode-gasd/issues"
+  },
+  "homepage": "https://github.com/General-Agentic-Software-Design/vscode-gasd#readme"
 }

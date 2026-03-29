@@ -1,0 +1,33 @@
+VERSION 1.2
+/* 
+   --- Validation Spec: Negative Syntax ---
+   Validates syntax failures and rejection edge cases.
+*/
+CONTEXT: "VS Code Extension Validation"
+TARGET: "Mocha"
+TRACE: "#US-41"
+
+NAMESPACE: "gasd.vscode.validation.negative"
+
+TYPE Requirement:
+    name: String
+
+COMPONENT NegativeValidator:
+    PATTERN: "Error State Validator"
+    INTERFACE:
+        validate_failures() -> Boolean
+
+FLOW validate_negative_scenarios():
+    @trace("#US-41") AS TR_NEG_VAL
+    1. ACHIEVE "Load malformed GASD 1.2 syntax"
+        POSTCONDITION: result != null
+    2. MATCH "Lexer Output":
+        "LEX_ERROR" | "PARSE_ERROR" -> LOG "Fatal errors successfully caught"
+        DEFAULT -> THROW "False Positive"
+    3. ACHIEVE "Load ACHIEVE block lacking POSTCONDITION in VERSION 1.2 file"
+        POSTCONDITION: result != null
+    4. MATCH "Diagnostic Output":
+        "LINT-001 ERROR" -> LOG "LINT-001 correctly identified"
+        DEFAULT -> THROW "GEP-6 POSTCONDITION Rule Failed"
+    5. VALIDATE "Syntax is explicitly rejected when failing GEP-5 (VALIDATE without AS TYPE)" AS TYPE.Requirement
+    6. RETURN "Success"

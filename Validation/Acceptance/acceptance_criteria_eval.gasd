@@ -1,0 +1,39 @@
+VERSION 1.2
+/* 
+   --- Validation Spec: Acceptance Criteria ---
+   Validates behavioral acceptance.
+*/
+CONTEXT: "VS Code Extension Validation"
+TARGET: "TypeScript Test Frameworks"
+TRACE: "#US-1-TO-41"
+
+IMPORT "design/tests.gasd" AS TestingDesign
+
+CONTRACT TestingDesign:
+    INPUT: ast: Any
+    OUTPUT: Boolean
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result != null
+    VERSION: "1.2.0"
+
+NAMESPACE: "gasd.vscode.validation.acceptance"
+
+TYPE Requirement:
+    name: String
+
+COMPONENT AcceptanceValidator:
+    PATTERN: "Behavior Validator"
+    INTERFACE:
+        validate_ac() -> Boolean
+
+FLOW validate_acceptance_behaviors():
+    @trace("#US-1 to #US-41") AS TR_AC_VAL
+    1. ACHIEVE "Extract all AC IDs from Requirments/"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Mock Document Change Event"
+        POSTCONDITION: result != null
+    3. VALIDATE "AST semantic diagnostics successfully return semantic triples for annotations" AS TYPE.Requirement
+    4. ACHIEVE "Trigger GEP-6 specific semantic checks (LINT-001 to LINT-012)"
+        POSTCONDITION: result != null
+    5. RETURN "Success"

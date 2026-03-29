@@ -1,0 +1,111 @@
+VERSION 1.2
+// Exhaustive Keyword Test Suite for GASD 1.2
+// Trace: #REG-001
+
+NAMESPACE: "Test.Keywords"
+CONTEXT: "Syntax Highlighting Verification"
+TARGET: "VS Code"
+
+IMPORT "other.gasd" AS Other
+
+RESOURCES:
+    - "https://gasd.io/spec/1.2"
+
+DECISION "High-Level Architecture":
+    CHOSEN: "Microservices"
+    RATIONALE: "Scalability and isolation"
+    ALTERNATIVES: ["Monolith", "Serverless"]
+    AFFECTS: [*]
+
+TYPE User:
+    id: UUID
+    email: String @unique
+    status: Enum
+    is_active: Boolean @default(true)
+
+TYPE Order @status("DRAFT"):
+    total: Decimal
+    items: List<Any>
+    metadata: Map<String, String>
+
+CONTRACT PaymentService.charge:
+    INPUT: amount: Decimal, currency: String
+    OUTPUT: Result<Void>
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result IS Void
+        CASE failure:
+            THROWS: "PaymentError"
+            AFTER: 3000ms
+    IDEMPOTENT: true
+
+STRATEGY fast_search:
+    ALGORITHM: "Index-based lookup"
+    PRECONDITION: data IS_SORTED
+    COMPLEXITY: O(1)
+    INPUT: key: String
+    OUTPUT: Optional<Any>
+
+COMPONENT Logger:
+    PATTERN: "Singleton"
+    DEPENDENCIES: [FileStream]
+    INTERFACE:
+        log(msg: String) -> Void
+
+FLOW process_data(data: Any) -> Result<Void>:
+    1. VALIDATE data AS TYPE.Any
+    2. ACHIEVE "Prepare execution"
+        POSTCONDITION: true
+        TIMEOUT: 500ms
+    3. EXECUTE "Main Logic" DEPENDS_ON STEP 2
+    4. UPDATE "State" WITH "Ready"
+    5. TRANSFORM "Input" TO "Output"
+    6. APPLY "Strategy" TO "Result"
+    7. IF true:
+        LOG "Success"
+    8. ELSE:
+        LOG "Failure"
+    9. MATCH data:
+        "test" -> RETURN null
+        DEFAULT -> THROW "Error"
+    10. PERSIST "Record"
+    11. RETURN null
+    ON_ERROR:
+        THROW "Fatal"
+
+CONSTRAINT: "Security compliance"
+INVARIANT LOCAL: "Balance >= 0"
+INVARIANT GLOBAL: "Unique IDs across system"
+
+ASSUMPTION "High Availability":
+    AFFECTS: [PaymentService]
+    CONSEQUENCE: "Service down if assumption fails"
+
+MODEL "Consistency Model":
+    VERIFIES:
+        INVARIANT GLOBAL: "Data eventual consistency"
+    ASSUMPTIONS:
+        - "Network partition handled"
+
+QUESTION: "Is this exhaustive?"
+    BLOCKING: false
+    CONTEXT: "Grammar test"
+
+APPROVE "High-Level Architecture":
+    STATUS: APPROVED
+    BY: "Architect"
+    DATE: "2026-03-29"
+    NOTES: "Verified"
+
+TODO: "Add more keywords"
+REVIEW: "Grammar coverage"
+
+// Literal values
+"A String"
+1234
+12.34
+true
+false
+null
+@annotation
+@annotation("value")

@@ -19,7 +19,7 @@ npm run compile
 
 # 4. Package for installation
 echo "🎁 Creating .vsix package..."
-npx @vscode/vsce package --allow-missing-repository --out ../build/installation/vscode-gasd-1.0.0.vsix
+npx @vscode/vsce package --allow-missing-repository --out ../build/installation/vscode-gasd-1.2.0.vsix
 
-echo "✅ Packaging complete! Installer: vscode-gasd-1.0.0.vsix"
-echo "To install, run: code --install-extension vscode-gasd-1.0.0.vsix"
+echo "✅ Packaging complete! Installer: vscode-gasd-1.2.0.vsix"
+echo "To install, run: code --install-extension vscode-gasd-1.2.0.vsix"

@@ -1,0 +1,68 @@
+VERSION 1.2
+/* 
+   --- Validation Spec: Design Structure ---
+   Validates expert structure logic for the generated design GASD files.
+*/
+CONTEXT: "VS Code Extension Validation"
+TARGET: "GASD AST"
+TRACE: "#US-1-TO-41"
+
+IMPORT "design/lsp_server.gasd" AS ServerDesign
+IMPORT "design/extension_client.gasd" AS ClientDesign
+IMPORT "design/types.gasd" AS TypesDesign
+IMPORT "design/vscode_gasd_extension.gasd" AS ExtensionDesign
+
+CONTRACT ServerDesign:
+    INPUT: ast: Any
+    OUTPUT: Boolean
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result != null
+    VERSION: "1.2.0"
+
+CONTRACT ClientDesign:
+    INPUT: ast: Any
+    OUTPUT: Boolean
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result != null
+    VERSION: "1.2.0"
+
+CONTRACT TypesDesign:
+    INPUT: ast: Any
+    OUTPUT: Boolean
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result != null
+    VERSION: "1.2.0"
+
+CONTRACT ExtensionDesign:
+    INPUT: ast: Any
+    OUTPUT: Boolean
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result != null
+    VERSION: "1.2.0"
+
+NAMESPACE: "gasd.vscode.validation.design"
+
+TYPE Requirement:
+    name: String
+
+COMPONENT DesignStructureValidator:
+    PATTERN: "AST Validator"
+    INTERFACE:
+        validate_architecture() -> Boolean
+
+FLOW validate_design_architecture():
+    @trace("#US-1 to #US-41") AS TR_DESIGN_VAL
+    1. ACHIEVE "Load design GASD ASTs"
+        POSTCONDITION: result != null
+    2. VALIDATE "ASTs contain COMPONENT and INTERFACE blocks" AS TYPE.Requirement
+    3. VALIDATE "All cross-file dependencies use exact IMPORT aliases" AS TYPE.Requirement
+    4. VALIDATE "DECISION blocks are present and articulate AFFECTS fields" AS TYPE.Requirement
+    5. ACHIEVE "Ensure GEP-5 explicit AS TYPE binding is employed"
+        POSTCONDITION: result != null
+    6. ACHIEVE "Ensure INVARIANT scopes (LOCAL/GLOBAL) are present per GEP-6"
+        POSTCONDITION: result != null
+    7. RETURN "Success"
