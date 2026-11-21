@@ -32,7 +32,7 @@ export type LintErrorCode =
     | 'LINT-004' // Invalid Idempotency Tuple
     | 'LINT-005' // Type Mismatches
     | 'LINT-006' // Invalid Rule Def
-    | 'LINT-007' // Action missing state
+    | 'LINT-007' // Contract has no case or case has no outcome
     | 'LINT-008' // Missing Dependency Ref
     | 'LINT-009' // Circular DEPENDS_ON
     | 'LINT-010' // Invalid Decision Path

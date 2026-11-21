@@ -7,14 +7,13 @@ CONTEXT: "VS Code Extension Validation"
 TARGET: "TypeScript Test Frameworks"
 TRACE: "#US-1-TO-41"
 
-IMPORT "design/tests.gasd" AS TestingDesign
+IMPORT "../../design/tests.gasd" AS TestingDesign
 
-CONTRACT TestingDesign:
-    INPUT: ast: Any
-    OUTPUT: Boolean
+CONTRACT TestingDesign.AcceptanceTestSuite.test_gasd12_contract_signatures:
+    OUTPUT: Void
     BEHAVIORS:
         CASE success:
-            POSTCONDITION: result != null
+            POSTCONDITION: result == void
     VERSION: "1.2.0"
 
 NAMESPACE: "gasd.vscode.validation.acceptance"
@@ -28,7 +27,7 @@ COMPONENT AcceptanceValidator:
         validate_ac() -> Boolean
 
 FLOW validate_acceptance_behaviors():
-    @trace("#US-1 to #US-41") AS TR_AC_VAL
+    @trace("US-1-to-US-41") AS TR_AC_VAL
     1. ACHIEVE "Extract all AC IDs from Requirments/"
         POSTCONDITION: result != null
     2. ACHIEVE "Mock Document Change Event"
@@ -37,3 +36,15 @@ FLOW validate_acceptance_behaviors():
     4. ACHIEVE "Trigger GEP-6 specific semantic checks (LINT-001 to LINT-012)"
         POSTCONDITION: result != null
     5. RETURN "Success"
+
+FLOW accept_gasd12_contracts():
+    1. ENSURE "A contract referencing an interface by import alias accepts multiple typed parameters with nested generics and qualified types, and a zero-parameter method omits INPUT" @trace("AT-GEP7-001") AS TR_TYPED_SIGNATURE
+        OTHERWISE THROW AcceptanceFailure
+    2. ENSURE "Syntax and semantic AST exports retain two guards in source order, including field paths, and a false guard short-circuits an unavailable field in the following guard" @trace("AT-GEP7-002") AS TR_GUARD_AST
+        OTHERWISE THROW AcceptanceFailure
+    3. ENSURE "A null email matches the null-input exception, and non-null input can match success, retry, or timeout independently of case order" @trace("AT-GEP7-003") AS TR_ELIGIBLE_CASES
+        OTHERWISE THROW AcceptanceFailure
+    4. ENSURE "A normal return with missing quoted or timing evidence is unverified if the case could still match. Contradictory evidence or an impossible completion is a violation" @trace("AT-GEP7-004") AS TR_OUTCOME_EVIDENCE
+        OTHERWISE THROW AcceptanceFailure
+    5. ENSURE "The editor offers WHEN completion and reports the verified case through GASD: Verify Contract Call"
+        OTHERWISE THROW AcceptanceFailure

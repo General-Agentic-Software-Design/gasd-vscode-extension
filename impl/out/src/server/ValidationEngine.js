@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GASD12LintEngine = void 0;
 const vscode_languageserver_1 = require("vscode-languageserver");
+const contracts_1 = require("./contracts");
 class GASD12LintEngine {
     // Core Evaluator #US-39, triggers #US-30, #US-31, #US-33
-    validateDocument(document) {
+    validateDocument(document, readImport) {
         const text = document.getText();
         const diagnostics = [];
         // Check if file is Legacy 1.1 without VERSION (#US-40)
@@ -83,7 +84,7 @@ class GASD12LintEngine {
             };
             diagnostics.push(diagnostic);
         }
-        return diagnostics;
+        return diagnostics.concat((0, contracts_1.analyzeContracts)(text, { uri: document.uri, readImport }).diagnostics);
     }
 }
 exports.GASD12LintEngine = GASD12LintEngine;

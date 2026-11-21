@@ -1,0 +1,20 @@
+{
+    "GASD 1.2": {
+        "prefix": "version12",
+        "body": "VERSION 1.2",
+        "description": "Declare GASD 1.2"
+    },
+    "Guarded contract": {
+        "prefix": "contract",
+        "body": [
+            "CONTRACT ${1:Service.method}:",
+            "    INPUT: ${2:parameter}: ${3:String}",
+            "    OUTPUT: ${4:Void}",
+            "    BEHAVIORS:",
+            "        CASE ${5:success}:",
+            "            WHEN: $2 != null",
+            "            POSTCONDITION: ${6:result == void}"
+        ],
+        "description": "Declare the signature and a guarded case for a GASD 1.2 interface method"
+    }
+}

@@ -7,7 +7,7 @@ VERSION 1.2
 */
 CONTEXT: "VS Code Extension / LSP"
 TARGET: "TypeScript 5.x"
-TRACE: "#US-1-TO-41"
+TRACE: "#US-1-TO-41", "AC-1-2", "AC-1-3", "AC-1-4", "AC-1-5", "AC-1-6"
 
 IMPORT "types.gasd" AS TypesMain
 IMPORT "lsp_server.gasd" AS Server
@@ -18,7 +18,7 @@ NAMESPACE: "gasd.vscode.main"
 
 /// Expert Pattern: Use a single orchestrator to manage lifecycle and components.
 
-COMPONENT GASDExtension @trace("#US-15") AS TRACE_US_15 @trace("#US-27") AS TRACE_US_27 @trace("#US-28") AS TRACE_US_28:
+COMPONENT GASDExtension @trace("US-15") AS TRACE_US_15 @trace("US-27") AS TRACE_US_27 @trace("US-28") AS TRACE_US_28:
     PATTERN: "Extension Entry Point"
     DEPENDENCIES: [
         Client.ExtensionClient,
@@ -29,8 +29,8 @@ COMPONENT GASDExtension @trace("#US-15") AS TRACE_US_15 @trace("#US-27") AS TRAC
     RESOURCES:
         - "language-configuration.json"
         - "client/gasd.tmLanguage.json"
-        - "snippets/gasd.code-snippets" @trace("#US-2") AS TRACE_US_2
-        - "icons/gasd_icon.png" @trace("#AC-27-2") AS TRACE_AC_27_2// @trace("#AC-28-11 (GEP-4 Resource Spec)") AS TRACE_AC_28_11__GEP_4_RESOURCE_SPEC
+        - "snippets/gasd.code-snippets" @trace("US-2") AS TRACE_US_2
+        - "icons/gasd_icon.png" @trace("AC-27-2") AS TRACE_AC_27_2// @trace("AC-28-11-GEP-4-Resource-Spec") AS TRACE_AC_28_11__GEP_4_RESOURCE_SPEC
 
     INTERFACE:
         on_startup() -> Void
@@ -50,49 +50,55 @@ DECISION "Strict Compliance Enforcement":
     ALTERNATIVES: ["Loose Validation", "Warning-only mode"]
     AFFECTS: [Server.Parser]
 
-DECISION "Version-Aware Severity" @trace("#US-29") AS TRACE_VER_SEVERITY:
+DECISION "Version-Aware Severity" @trace("US-29") AS TRACE_VER_SEVERITY:
     CHOSEN: "Dual-mode severity: ERROR for 1.2 files, WARNING for 1.1 files"
     RATIONALE: "GEP-6 mandates new constructs only in VERSION 1.2 files; 1.1 files must remain backward compatible"
     ALTERNATIVES: ["Uniform ERROR severity", "No version detection"]
     AFFECTS: [Server.GASD12LintEngine]
 
+DECISION "GEP-7 Contract Verification" @trace("AT-GEP7-002") AS TRACE_GEP7_AST:
+    CHOSEN: "Validate GASD 1.2 contract models in the language server and verify supplied observations through a VS Code command"
+    RATIONALE: "Contract diagnostics and observed-call conformance share the same parsed contract model"
+    ALTERNATIVES: ["Static syntax checks only"]
+    AFFECTS: [Server.ContractAnalyzer, Server.ContractVerifier, Client.ExtensionClient]
+
+INVARIANT LOCAL: "TextMate highlighting, completion, hover, and keyword case correction recognize WHEN within GASD 1.2 contract cases."
+
 // --- Global Invariants ---
 INVARIANT GLOBAL: "Expert Compliance: All components MUST trace back to #US or #AC identifiers."
-INVARIANT GLOBAL: "LSP 3.17 compliance for all core features." @trace("#US-18-TO-26") AS TRACE_US_18_TO_US_26
-INVARIANT GLOBAL: "Expert Compliance: Design MUST be derived directly from user-story.md, gasd-1.1-user-story.md, and ver-1.2/user-story.md." @trace("#US-27") AS TRACE_US_27 @trace("#US-28") AS TRACE_US_28
-INVARIANT GLOBAL: "GEP-3/4 Compliance: All flow logic MUST use formalized keywords and permissive math expressions." @trace("#AC-28-4 to #AC-28-12") AS TRACE_AC_28_4_TO_AC_28_12
-INVARIANT GLOBAL: "GEP-5 Compliance: All VALIDATE steps MUST use explicit AS TYPE binding." @trace("#AC-28-13") AS TRACE_AC_28_13
-INVARIANT GLOBAL: "GEP-6 Compliance: All GASD 1.2 files MUST comply with VERSION, POSTCONDITION, CONTRACT, INVARIANT scope, and AS identifier rules." @trace("#US-29 to #US-41") AS TRACE_GEP_6
+INVARIANT GLOBAL: "LSP 3.17 compliance for all core features." @trace("US-18-TO-26") AS TRACE_US_18_TO_US_26
+INVARIANT GLOBAL: "Expert Compliance: Design MUST be derived directly from user-story.md, gasd-1.1-user-story.md, and ver-1.2/user-story.md." @trace("US-27") AS TRACE_US_27 @trace("US-28") AS TRACE_US_28
+INVARIANT GLOBAL: "GEP-3/4 Compliance: All flow logic MUST use formalized keywords and permissive math expressions." @trace("AC-28-4-to-AC-28-12") AS TRACE_AC_28_4_TO_AC_28_12
+INVARIANT GLOBAL: "GEP-5 Compliance: All VALIDATE steps MUST use explicit AS TYPE binding." @trace("AC-28-13") AS TRACE_AC_28_13
+INVARIANT GLOBAL: "GEP-6 Compliance: All GASD 1.2 files MUST comply with VERSION, POSTCONDITION, CONTRACT, INVARIANT scope, and AS identifier rules." @trace("US-29-to-US-41") AS TRACE_GEP_6
 
 
-CONTRACT Types:
-    INPUT: value: Any
-    OUTPUT: Any
+CONTRACT TypesMain.ContractSyntax.parse_contracts:
+    INPUT: content: String
+    OUTPUT: List<TypesMain.ContractDefinition>
     BEHAVIORS:
         CASE success:
             POSTCONDITION: result != null
     VERSION: "1.2.0"
 
-CONTRACT Server:
-    INPUT: value: Any
-    OUTPUT: Any
+CONTRACT Server.GASDServer.on_document_change:
+    INPUT: uri: String, content: String
+    OUTPUT: List<TypesMain.Diagnostic>
     BEHAVIORS:
         CASE success:
             POSTCONDITION: result != null
     VERSION: "1.2.0"
 
-CONTRACT Client:
-    INPUT: value: Any
-    OUTPUT: Any
+CONTRACT Client.ExtensionClient.deactivate:
+    OUTPUT: Void
     BEHAVIORS:
         CASE success:
-            POSTCONDITION: result != null
+            POSTCONDITION: result == void
     VERSION: "1.2.0"
 
-CONTRACT Testing:
-    INPUT: value: Any
-    OUTPUT: Any
+CONTRACT Testing.AcceptanceTestSuite.test_gasd12_contract_signatures:
+    OUTPUT: Void
     BEHAVIORS:
         CASE success:
-            POSTCONDITION: result != null
+            POSTCONDITION: result == void
     VERSION: "1.2.0"

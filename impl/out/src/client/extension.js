@@ -38,6 +38,7 @@ exports.deactivate = deactivate;
 const path = __importStar(require("path"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
+const contractProtocol_1 = require("../shared/contractProtocol");
 let client;
 function activate(context) {
     // The server is implemented in node
@@ -52,11 +53,12 @@ function activate(context) {
             options: debugOptions
         }
     };
+    const gasdFiles = vscode_1.workspace.createFileSystemWatcher('**/*.gasd');
+    context.subscriptions.push(gasdFiles);
     const clientOptions = {
-        // Register the server for plain text documents
-        documentSelector: [{ scheme: 'file', language: 'gasd' }],
+        documentSelector: [{ scheme: 'file', language: 'gasd' }, { scheme: 'untitled', language: 'gasd' }],
         synchronize: {
-            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/.clientrc')
+            fileEvents: gasdFiles
         }
     };
     client = new node_1.LanguageClient('gasdLanguageServer', 'GASD Language Server', serverOptions, clientOptions);
@@ -77,9 +79,55 @@ function activate(context) {
             vscode_1.window.showInformationMessage(`GASD: ${cmd} triggered`);
         }));
     });
+    context.subscriptions.push(vscode_1.commands.registerCommand('gasd.verifyContractCall', verifyContractObservation));
     // Start the client. This will also launch the server
-    client.start();
+    const started = client.start();
     console.log('GASD: Extension Activated');
+    return started;
+}
+async function verifyContractObservation(observation) {
+    const document = vscode_1.window.activeTextEditor?.document;
+    if (document?.languageId !== 'gasd') {
+        void vscode_1.window.showWarningMessage('Open a GASD document before verifying a contract call.');
+        return;
+    }
+    let call = observation;
+    if (call === undefined) {
+        const text = await vscode_1.window.showInputBox({
+            prompt: 'Enter an observed contract call as JSON',
+            placeHolder: '{"contract":"Service.method","arguments":{},"outcome":{"kind":"return"}}',
+            ignoreFocusOut: true,
+        });
+        if (text === undefined)
+            return;
+        try {
+            call = JSON.parse(text);
+        }
+        catch {
+            void vscode_1.window.showErrorMessage('The contract call observation must be valid JSON.');
+            return;
+        }
+    }
+    if (!(0, contractProtocol_1.isContractCallRequest)(call)) {
+        void vscode_1.window.showErrorMessage('Supply a contract name, named arguments, and a valid return or throw observation.');
+        return;
+    }
+    try {
+        const result = await client.sendRequest(contractProtocol_1.verifyContractRequest, { uri: document.uri.toString(), call });
+        if (observation === undefined) {
+            if (result.status === 'verified')
+                void vscode_1.window.showInformationMessage(result.message);
+            else if (result.status === 'unverified')
+                void vscode_1.window.showWarningMessage(`Unverified. ${result.message}`);
+            else
+                void vscode_1.window.showErrorMessage(result.message);
+        }
+        return result;
+    }
+    catch (error) {
+        void vscode_1.window.showErrorMessage(`Could not verify the contract call. ${error.message}`);
+        return;
+    }
 }
 function deactivate() {
     if (!client) {

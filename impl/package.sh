@@ -1,25 +1,20 @@
 #!/bin/bash
-# --- GASD Extension Packaging Script ---
-# Strictly follows GASD expert build plan.
+set -euo pipefail
 
-set -e
-
-echo "📦 Starting GASD Extension Packaging..."
-
-# 1. Navigate to implementation root
 cd "$(dirname "$0")"
 
-# 2. Ensure dependencies are installed
-echo "🔍 Installing dependencies..."
-npm install
+if [ ! -x node_modules/.bin/tsc ] || ! node -e "require.resolve('vscode-languageclient/node'); require.resolve('vscode-languageserver/node'); require.resolve('vscode-languageserver-textdocument')"; then
+    npm ci
+fi
 
-# 3. Compile the extension
-echo "🔨 Compiling TypeScript..."
 npm run compile
+mkdir -p ../build/installation
+artifact="../build/installation/$(node -p 'const p = require("./package.json"); `${p.name}-${p.version}`').vsix"
 
-# 4. Package for installation
-echo "🎁 Creating .vsix package..."
-npx @vscode/vsce package --allow-missing-repository --out ../build/installation/vscode-gasd-1.2.0.vsix
+if command -v vsce >/dev/null 2>&1; then
+    vsce package --allow-missing-repository --out "$artifact"
+else
+    npx --yes @vscode/vsce package --allow-missing-repository --out "$artifact"
+fi
 
-echo "✅ Packaging complete! Installer: vscode-gasd-1.2.0.vsix"
-echo "To install, run: code --install-extension vscode-gasd-1.2.0.vsix"
+printf 'Installer: %s\n' "$artifact"

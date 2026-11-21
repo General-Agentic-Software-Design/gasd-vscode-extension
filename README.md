@@ -39,8 +39,12 @@ To create a `.vsix` installer for your extension:
 3. Install the generated bundle:
 
     ```bash
-    code --install-extension build/installation/vscode-gasd-1.2.0.vsix
+    code --install-extension build/installation/vscode-gasd-1.2.1.vsix
     ```
+
+## What's New in 1.2.1 (GEP-7)
+
+The extension validates GASD 1.2 contract signatures, case outcomes, and ordered `WHEN` guards. Open a contract file and run **GASD: Verify Contract Call** to check an observed return or exception. [Observation format](impl/README.md#verify-an-observed-contract-call)
 
 ## 🌟 What's New in 1.2.0 (GEP-6)
 

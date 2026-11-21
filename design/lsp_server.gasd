@@ -7,55 +7,55 @@ VERSION 1.2
 */
 CONTEXT: "VS Code Extension / LSP"
 TARGET: "TypeScript 5.x"
-TRACE: "#US-5-TO-9", "#US-13", "#US-18", "#US-19", "#US-21", "#US-22", "#US-23", "#US-25", "#US-26", "#US-28", "#US-30", "#US-32", "#US-34", "#US-38", "#US-39", "#US-41"
+TRACE: "#US-5-TO-9", "#US-13", "#US-18", "#US-19", "#US-21", "#US-22", "#US-23", "#US-25", "#US-26", "#US-28", "#US-30", "#US-32", "#US-34", "#US-38", "#US-39", "#US-41", "AC-3-1", "AC-3-2", "AC-5-3", "AC-6-1", "AC-6-2", "AC-7-2", "AC-8-1", "AC-9-3", "AC-9-4", "AC-10-1", "AC-10-2", "AC-11-2", "AC-19-2", "AC-20-1", "AC-28-1", "AC-28-2", "AC-28-3", "AC-28-4", "AC-28-5", "AC-28-6", "AC-28-7", "AC-28-8", "AC-28-9", "AC-28-10", "AC-28-11", "AC-28-12", "AC-28-14", "AC-28-15", "AC-28-16", "AC-28-17", "AC-28-18", "AC-30-1", "AC-30-2", "AC-30-4", "AC-30-5", "AC-30-6", "AC-31-2", "AC-31-5", "AC-32-1", "AC-32-4", "AC-33-1", "AC-33-3", "AC-34-1", "AC-34-2", "AC-35-1", "AC-35-2", "AC-35-4", "AC-38-2", "AC-41-2", "AC-41-3"
 
 IMPORT "types.gasd" AS Types
 
 NAMESPACE: "gasd.lsp.server"
 
-COMPONENT GASDServer @trace("#US-5-TO-9") AS TRACE_US_5_TO_US_9 @trace("#US-18-TO-26") AS TRACE_US_18_TO_US_26:
+COMPONENT GASDServer @trace("US-5-TO-9") AS TRACE_US_5_TO_US_9 @trace("US-18-TO-26") AS TRACE_US_18_TO_US_26:
     PATTERN: "Language Server"
     DEPENDENCIES: [Parser, AgentService, SymbolManager]
     
     INTERFACE:
         on_initialize(params: Map<String, Any>) -> Map<String, Any>
         on_document_change(uri: String, content: String) -> List<Types.Diagnostic>
-        on_hover(uri: String, pos: Types.Position) -> Optional<Types.Hover> @trace("#US-7") AS TRACE_US_7
-        on_completion(uri: String, pos: Types.Position) -> List<Types.CompletionItem> @trace("#US-5") AS TRACE_US_5
-        on_definition(uri: String, pos: Types.Position) -> Optional<Types.Location> @trace("#US-6") AS TRACE_US_6
-        on_signature_help(uri: String, pos: Types.Position) -> Optional<Types.SignatureHelp> @trace("#US-22") AS TRACE_US_22
-        on_document_symbols(uri: String) -> List<Types.SymbolInformation> @trace("#US-19") AS TRACE_US_19
-        on_code_actions(uri: String, range: Types.Range, context: Types.CodeActionContext) -> List<Types.CodeAction> @trace("#US-18") AS TRACE_US_18 @trace("#AC-18-3") AS TRACE_AC_18_3
-        on_semantic_tokens(uri: String) -> Types.SemanticTokens @trace("#US-21") AS TRACE_US_21
-        on_inlay_hints(uri: String, range: Types.Range) -> List<Types.InlayHint> @trace("#US-23") AS TRACE_US_23
-        on_rename(uri: String, pos: Types.Position, newName: String) -> Types.WorkspaceEdit @trace("#US-8") AS TRACE_US_8
-        on_formatting(uri: String, options: Types.FormattingOptions) -> List<Types.TextEdit> @trace("#US-4") AS TRACE_US_4 @trace("#AC-4-3") AS TRACE_AC_4_3
-        on_type_formatting(uri: String, pos: Types.Position, ch: String) -> List<Types.TextEdit> @trace("#AC-4-4") AS TRACE_AC_4_4
-        on_workspace_symbols(query: String) -> List<Types.SymbolInformation> @trace("#US-20") AS TRACE_US_20
-        on_selection_range(uri: String, positions: List<Types.Position>) -> List<Types.SelectionRange> @trace("#US-24") AS TRACE_US_24
-        on_call_hierarchy(uri: String, pos: Types.Position) -> List<Types.CallHierarchyItem> @trace("#US-25") AS TRACE_US_25
-        on_document_highlight(uri: String, pos: Types.Position) -> List<Types.DocumentHighlight> @trace("#US-26") AS TRACE_US_26
+        on_hover(uri: String, pos: Types.Position) -> Optional<Types.Hover> @trace("US-7") AS TRACE_US_7
+        on_completion(uri: String, pos: Types.Position) -> List<Types.CompletionItem> @trace("US-5") AS TRACE_US_5
+        on_definition(uri: String, pos: Types.Position) -> Optional<Types.Location> @trace("US-6") AS TRACE_US_6
+        on_signature_help(uri: String, pos: Types.Position) -> Optional<Types.SignatureHelp> @trace("US-22") AS TRACE_US_22
+        on_document_symbols(uri: String) -> List<Types.SymbolInformation> @trace("US-19") AS TRACE_US_19
+        on_code_actions(uri: String, range: Types.Range, context: Types.CodeActionContext) -> List<Types.CodeAction> @trace("US-18") AS TRACE_US_18 @trace("AC-18-3") AS TRACE_AC_18_3
+        on_semantic_tokens(uri: String) -> Types.SemanticTokens @trace("US-21") AS TRACE_US_21
+        on_inlay_hints(uri: String, range: Types.Range) -> List<Types.InlayHint> @trace("US-23") AS TRACE_US_23
+        on_rename(uri: String, pos: Types.Position, newName: String) -> Types.WorkspaceEdit @trace("US-8") AS TRACE_US_8
+        on_formatting(uri: String, options: Types.FormattingOptions) -> List<Types.TextEdit> @trace("US-4") AS TRACE_US_4 @trace("AC-4-3") AS TRACE_AC_4_3
+        on_type_formatting(uri: String, pos: Types.Position, ch: String) -> List<Types.TextEdit> @trace("AC-4-4") AS TRACE_AC_4_4
+        on_workspace_symbols(query: String) -> List<Types.SymbolInformation> @trace("US-20") AS TRACE_US_20
+        on_selection_range(uri: String, positions: List<Types.Position>) -> List<Types.SelectionRange> @trace("US-24") AS TRACE_US_24
+        on_call_hierarchy(uri: String, pos: Types.Position) -> List<Types.CallHierarchyItem> @trace("US-25") AS TRACE_US_25
+        on_document_highlight(uri: String, pos: Types.Position) -> List<Types.DocumentHighlight> @trace("US-26") AS TRACE_US_26
 
-COMPONENT Parser @trace("#AC-9-1") AS TRACE_AC_9_1 @trace("#AC-21-1") AS TRACE_AC_21_1:
+COMPONENT Parser @trace("AC-9-1") AS TRACE_AC_9_1 @trace("AC-21-1") AS TRACE_AC_21_1:
     INTERFACE:
         parse(content: String) -> Result<Types.AST>
         get_semantic_tokens() -> Types.SemanticTokens
         get_outline() -> List<Types.SymbolInformation>
-        get_folding_ranges() -> List<Types.Range> @trace("#US-3") AS TRACE_US_3
+        get_folding_ranges() -> List<Types.Range> @trace("US-3") AS TRACE_US_3
 
-COMPONENT ValidationEngine @trace("#US-17") AS TRACE_US_17:
+COMPONENT ValidationEngine @trace("US-17") AS TRACE_US_17:
     INTERFACE:
-        check_compatibility(ast: Types.AST, target: String) -> List<Types.Diagnostic> @trace("#AC-17-1") AS TRACE_AC_17_1
+        check_compatibility(ast: Types.AST, target: String) -> List<Types.Diagnostic> @trace("AC-17-1") AS TRACE_AC_17_1
 
-COMPONENT VisualizationService @trace("#US-14") AS TRACE_US_14:
+COMPONENT VisualizationService @trace("US-14") AS TRACE_US_14:
     INTERFACE:
-        generate_flowchart(flow_id: String) -> String @trace("#AC-14-1") AS TRACE_AC_14_1
+        generate_flowchart(flow_id: String) -> String @trace("AC-14-1") AS TRACE_AC_14_1
 
-COMPONENT TraceabilityService @trace("#US-11") AS TRACE_US_11:
+COMPONENT TraceabilityService @trace("US-11") AS TRACE_US_11:
     INTERFACE:
-        get_coverage_report() -> Map<String, Any> @trace("#AC-11-1") AS TRACE_AC_11_1
+        get_coverage_report() -> Map<String, Any> @trace("AC-11-1") AS TRACE_AC_11_1
 
-COMPONENT AgentService @trace("#US-10") AS TRACE_US_10 @trace("#US-13") AS TRACE_US_13:
+COMPONENT AgentService @trace("US-10") AS TRACE_US_10 @trace("US-13") AS TRACE_US_13:
     INTERFACE:
         ask_question(context: String, question: String) -> String
         draft_design(requirement: String) -> String
@@ -64,7 +64,7 @@ COMPONENT AgentService @trace("#US-10") AS TRACE_US_10 @trace("#US-13") AS TRACE
 
 /// Implements #US-9 (Diagnostics) & #US-18 (Code Actions)
 FLOW validate_document(uri: String, content: String):
-    @trace("#AC-9-1") AS TRACE_AC_9_1 @trace("#AC-9-2") AS TRACE_AC_9_2 @trace("#AC-18-1") AS TRACE_AC_18_1 @trace("#US-28") AS TRACE_US_28
+    @trace("AC-9-1") AS TRACE_AC_9_1 @trace("AC-9-2") AS TRACE_AC_9_2 @trace("AC-18-1") AS TRACE_AC_18_1 @trace("US-28") AS TRACE_US_28
     1. ACHIEVE "Run Parser.parse(content)"
         POSTCONDITION: result != null
     2. MATCH result:
@@ -72,19 +72,19 @@ FLOW validate_document(uri: String, content: String):
             CREATE Types.Diagnostic:
                 message: "Syntax Error"
                 severity: ERROR
-            ACHIEVE "Generate Quick Fixes for typos" @trace("#AC-18-1") AS TRACE_AC_18_1
+            ACHIEVE "Generate Quick Fixes for typos" @trace("AC-18-1") AS TRACE_AC_18_1
                 POSTCONDITION: result != null
         "SUCCESS" -> 
-            VALIDATE "Directives (CONTEXT, TARGET) exist" AS TYPE.Requirement @trace("#AC-9-2") AS TRACE_AC_9_2
-            ON_ERROR: ACHIEVE "Report Missing Directives" @trace("#AC-18-2") AS TRACE_AC_18_2
+            VALIDATE "Directives (CONTEXT, TARGET) exist" AS TYPE.Requirement @trace("AC-9-2") AS TRACE_AC_9_2
+            ON_ERROR: ACHIEVE "Report Missing Directives" @trace("AC-18-2") AS TRACE_AC_18_2
                 POSTCONDITION: result != null
     3. PERSIST diagnostics via LSP connection
 
 /// Implements #US-13 (Human-in-the-Loop)
 FLOW handle_agent_loop(question: String):
-    @trace("#AC-13-1") AS TRACE_AC_13_1 @trace("#AC-13-2") AS TRACE_AC_13_2
+    @trace("AC-13-1") AS TRACE_AC_13_1 @trace("AC-13-2") AS TRACE_AC_13_2
     1. CREATE Types.Diagnostic for the `QUESTION` block
-    2. ACHIEVE "UI: Show CodeLens 'Answer Agent'" @trace("#AC-13-2") AS TRACE_AC_13_2
+    2. ACHIEVE "UI: Show CodeLens 'Answer Agent'" @trace("AC-13-2") AS TRACE_AC_13_2
         POSTCONDITION: result != null
     3. ACHIEVE "AgentService.ask_question(..., question)"
         POSTCONDITION: result != null
@@ -92,7 +92,7 @@ FLOW handle_agent_loop(question: String):
 
 /// Implements #US-21 (Semantic Highlighting)
 FLOW provide_semantic_tokens(uri: String):
-    @trace("#AC-21-1") AS TRACE_AC_21_1
+    @trace("AC-21-1") AS TRACE_AC_21_1
     1. ACHIEVE "Parser.get_semantic_tokens()"
         POSTCONDITION: result != null
     2. RETURN TRANSFORM(tokens, @encode("LSP-Semantic-Tokens"))
@@ -100,7 +100,7 @@ FLOW provide_semantic_tokens(uri: String):
 /// Implements #AC-5-4 (Spec-Correct Completion Casing)
 /// Completions MUST use textEdit (not insertText) to force EBNF-correct casing.
 FLOW provide_completions(uri: String, pos: Types.Position):
-    @trace("#AC-5-1") AS TRACE_AC_5_1 @trace("#AC-5-4") AS TRACE_AC_5_4
+    @trace("AC-5-1") AS TRACE_AC_5_1 @trace("AC-5-4") AS TRACE_AC_5_4
     1. ACHIEVE "Compute prefix range: scan backward from cursor to find word start"
         POSTCONDITION: result != null
     2. CREATE CompletionItem for each keyword, type, and annotation:
@@ -110,7 +110,7 @@ FLOW provide_completions(uri: String, pos: Types.Position):
 
 /// Implements #AC-4-4 (On-Type Auto-Correction)
 FLOW autocorrect_keyword_on_type(uri: String, pos: Types.Position, ch: String):
-    @trace("#AC-4-4") AS TRACE_AC_4_4
+    @trace("AC-4-4") AS TRACE_AC_4_4
     1. ACHIEVE "Get current and previous line content"
         POSTCONDITION: result != null
     2. MATCH keyword case:
@@ -122,9 +122,9 @@ FLOW autocorrect_keyword_on_type(uri: String, pos: Types.Position, ch: String):
 INVARIANT GLOBAL: "Expert Compliance: LSP Server must strictly validate against GASD 1.2.0 EBNF."
 
 
-CONTRACT Types:
-    INPUT: value: Any
-    OUTPUT: Any
+CONTRACT Types.ContractSyntax.parse_contracts:
+    INPUT: content: String
+    OUTPUT: List<Types.ContractDefinition>
     BEHAVIORS:
         CASE success:
             POSTCONDITION: result != null
@@ -139,23 +139,23 @@ COMPONENT SymbolManager:
 // ===================================================================
 
 /// Implements all 12 GEP-6 lint rules with version-aware severity.
-/// @trace("#US-39") AS TRACE_US_39
-COMPONENT GASD12LintEngine @trace("#US-39") AS TRACE_LINT_ENGINE @trace("#US-41") AS TRACE_NEG_VAL:
+/// @trace("US-39") AS TRACE_US_39
+COMPONENT GASD12LintEngine @trace("US-39") AS TRACE_LINT_ENGINE @trace("US-41") AS TRACE_NEG_VAL:
     PATTERN: "Rule Engine"
     DEPENDENCIES: [Parser]
     INTERFACE:
         lint_document(ast: Types.AST, version: Types.VersionDirective) -> List<Types.Diagnostic>
         get_lint_rules() -> List<Types.LintRule>
-        check_achieve_postcondition(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-30-3") AS TRACE_LINT_001
-        check_import_contract(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-31-4") AS TRACE_LINT_002
-        check_invariant_scope(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-33-2") AS TRACE_LINT_003
-        check_retry_idempotent(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-39-1") AS TRACE_LINT_004
-        check_annotation_ids(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-34-3") AS TRACE_LINT_011
-        check_environmental_assumptions(ast: Types.AST) -> List<Types.Diagnostic> @trace("#AC-35-3") AS TRACE_LINT_012
+        check_achieve_postcondition(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-30-3") AS TRACE_LINT_001
+        check_import_contract(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-31-4") AS TRACE_LINT_002
+        check_invariant_scope(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-33-2") AS TRACE_LINT_003
+        check_retry_idempotent(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-39-1") AS TRACE_LINT_004
+        check_annotation_ids(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-34-3") AS TRACE_LINT_011
+        check_environmental_assumptions(ast: Types.AST) -> List<Types.Diagnostic> @trace("AC-35-3") AS TRACE_LINT_012
 
 /// Stores and retrieves semantic triples for annotation hover intelligence.
-/// @trace("#US-38") AS TRACE_US_38
-COMPONENT AnnotationSemanticRegistry @trace("#US-38") AS TRACE_REGISTRY:
+/// @trace("US-38") AS TRACE_US_38
+COMPONENT AnnotationSemanticRegistry @trace("US-38") AS TRACE_REGISTRY:
     PATTERN: "Registry"
     INTERFACE:
         lookup(annotationType: String) -> Optional<Types.SemanticTriple>
@@ -163,30 +163,62 @@ COMPONENT AnnotationSemanticRegistry @trace("#US-38") AS TRACE_REGISTRY:
         get_all_annotations() -> List<String>
 
 /// Analyzes DEPENDS_ON clauses for circular dependencies and missing step refs.
-/// @trace("#US-32") AS TRACE_US_32
-COMPONENT DependencyGraphAnalyzer @trace("#US-32") AS TRACE_DEP_ANALYZER:
+/// @trace("US-32") AS TRACE_US_32
+COMPONENT DependencyGraphAnalyzer @trace("US-32") AS TRACE_DEP_ANALYZER:
     PATTERN: "Graph Analyzer"
     DEPENDENCIES: [Parser]
     INTERFACE:
         build_dependency_graph(flow: Types.AST) -> Map<Integer, List<Integer>>
-        detect_cycles(graph: Map<Integer, List<Integer>>) -> List<Types.Diagnostic> @trace("#AC-32-3") AS TRACE_LINT_009
-        validate_step_refs(graph: Map<Integer, List<Integer>>, maxStep: Integer) -> List<Types.Diagnostic> @trace("#AC-32-2") AS TRACE_LINT_008
+        detect_cycles(graph: Map<Integer, List<Integer>>) -> List<Types.Diagnostic> @trace("AC-32-3") AS TRACE_LINT_009
+        validate_step_refs(graph: Map<Integer, List<Integer>>, maxStep: Integer) -> List<Types.Diagnostic> @trace("AC-32-2") AS TRACE_LINT_008
 
 /// Detects the VERSION directive and routes to correct semantic ruleset.
-/// @trace("#US-29") AS TRACE_US_29
-COMPONENT VersionDetector @trace("#US-29") AS TRACE_VER_DETECT:
+/// @trace("US-29") AS TRACE_US_29
+COMPONENT VersionDetector @trace("US-29") AS TRACE_VER_DETECT:
     INTERFACE:
         detect_version(ast: Types.AST) -> Types.VersionDirective
         is_12_file(version: Types.VersionDirective) -> Boolean
+
+COMPONENT ContractAnalyzer @trace("AT-GEP7-001") AS TRACE_GEP7_SIGNATURE @trace("NT-GEP7-001") AS TRACE_GEP7_CASES @trace("NT-GEP7-002") AS TRACE_GEP7_MATCH @trace("NT-GEP7-003") AS TRACE_GEP7_GUARDS:
+    INTERFACE:
+        parse_contracts(content: String) -> List<Types.ContractDefinition>
+        validate_contracts(uri: String, content: String) -> List<Types.Diagnostic>
+        export_contract_ast(uri: String, content: String, mode: String) -> List<Types.ContractDefinition>
+
+COMPONENT ContractVerifier @trace("AT-GEP7-002") AS TRACE_GEP7_ORDER @trace("AT-GEP7-003") AS TRACE_GEP7_MATCHING @trace("AT-GEP7-004") AS TRACE_GEP7_EVIDENCE:
+    INTERFACE:
+        prepare_call(contract: Types.ContractDefinition, arguments: Map<String, Any>) -> Result<List<Types.ContractCase>>
+        verify_observed_call(uri: String, contractName: String, arguments: Map<String, Any>, outcome: Types.ContractCallOutcome) -> Types.ContractVerification
+
+FLOW validate_gasd12_contracts(uri: String, content: String):
+    1. ACHIEVE "Parse typed parameters, output, and indented cases including leading ordered WHEN predicates and all outcome clauses"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Resolve the interface in the current document or relative imported documents including open editor content. Accept alias.method, alias.component.method, and component.method when the owner is unambiguous"
+        POSTCONDITION: result != null
+    3. ACHIEVE "Match ordered parameter types and output using resolved type identities, check unique names and guard operand types and fields, and emit source diagnostics for syntax and signature failures"
+        POSTCONDITION: result != null
+    4. ACHIEVE "Emit LINT-007 for zero cases and for cases without POSTCONDITION or THROWS. Preserve diagnostics and guarded case ASTs for GASD 1.2"
+        POSTCONDITION: result != null
+
+FLOW verify_gasd12_contract_call(contractName: String, arguments: Map<String, Any>, outcome: Types.ContractCallOutcome):
+    1. ACHIEVE "Evaluate case guards on the supplied arguments before validating arguments or invoking code. Stop within each case at the first false guard and report any reached unevaluable guard"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Evaluate each eligible case against the observed normal return or typed exception and variant-specific payload bindings. Check predicates, elapsed duration or additional retries, and independent quoted evidence"
+        POSTCONDITION: result != null
+    3. ACHIEVE "Return verified if any eligible case is satisfied, unverified if one could match with more evidence, or violation if all eligible cases are ruled out. A reached invalid guard yields verification error"
+        POSTCONDITION: result != null
+
+INVARIANT LOCAL: "Comparisons use strict GASD kinds and exact null equality. Numeric ordering requires numeric operands. Result and error bindings are available only on their observed completion mode or variant."
+INVARIANT LOCAL: "An observed call and its result establish conformance only for that call. Evidence gaps never override a contradiction in the same case."
 
 // ===================================================================
 // GASD 1.2 Flows — GEP-6 Support
 // ===================================================================
 
 /// Version-aware validation: applies 1.2 lint rules only if VERSION 1.2 is declared.
-/// @trace("#US-39") AS TRACE_US_39_FLOW
+/// @trace("US-39") AS TRACE_US_39_FLOW
 FLOW validate_gasd12_compliance(uri: String, content: String):
-    @trace("#AC-39-1") AS TRACE_AC_39_1 @trace("#US-41") AS TRACE_US_41
+    @trace("AC-39-1") AS TRACE_AC_39_1 @trace("US-41") AS TRACE_US_41
     1. ACHIEVE "Parser.parse(content)"
         POSTCONDITION:
             result != null
@@ -205,9 +237,9 @@ FLOW validate_gasd12_compliance(uri: String, content: String):
     4. PERSIST diagnostics via LSP connection
 
 /// Returns semantic triple hover content for an annotation.
-/// @trace("#US-38") AS TRACE_US_38_FLOW
+/// @trace("US-38") AS TRACE_US_38_FLOW
 FLOW resolve_annotation_hover(uri: String, pos: Types.Position):
-    @trace("#AC-38-1") AS TRACE_AC_38_1
+    @trace("AC-38-1") AS TRACE_AC_38_1
     1. ACHIEVE "Identify annotation token at cursor position"
         POSTCONDITION:
             result != null
@@ -223,9 +255,9 @@ FLOW resolve_annotation_hover(uri: String, pos: Types.Position):
             RETURN "No semantic triple registered for this annotation"
 
 /// Validates DEPENDS_ON for cycles and missing step references.
-/// @trace("#US-32") AS TRACE_US_32_FLOW
+/// @trace("US-32") AS TRACE_US_32_FLOW
 FLOW check_dependency_graph(flow_ast: Types.AST):
-    @trace("#AC-32-2") AS TRACE_AC_32_2 @trace("#AC-32-3") AS TRACE_AC_32_3
+    @trace("AC-32-2") AS TRACE_AC_32_2 @trace("AC-32-3") AS TRACE_AC_32_3
     1. ACHIEVE "DependencyGraphAnalyzer.build_dependency_graph(flow_ast)"
         POSTCONDITION:
             result != null
