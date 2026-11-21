@@ -34,22 +34,35 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
+const promises_1 = require("node:fs/promises");
+const node_os_1 = require("node:os");
 const test_electron_1 = require("@vscode/test-electron");
 /** @trace #US-27, #US-15 */
 async function main() {
+    const profile = await (0, promises_1.mkdtemp)(path.join((0, node_os_1.tmpdir)(), 'gasd-tests-'));
     try {
         // The folder containing the Extension Manifest package.json
         // Passed to `--extensionDevelopmentPath`
-        const extensionDevelopmentPath = path.resolve(__dirname, '../../../');
+        const extensionDevelopmentPath = path.resolve(__dirname, '../..');
         // The path to the extension test script
         // Passed to --extensionTestsPath
         const extensionTestsPath = path.resolve(__dirname, './index');
-        // Download VS Code, unzip it and run the integration test
-        await (0, test_electron_1.runTests)({ extensionDevelopmentPath, extensionTestsPath });
+        await (0, test_electron_1.runTests)({
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            vscodeExecutablePath: process.env.GASD_VSCODE_EXECUTABLE,
+            launchArgs: [
+                '--user-data-dir', path.join(profile, 'user-data'),
+                '--extensions-dir', path.join(profile, 'extensions'),
+            ],
+        });
     }
     catch (err) {
-        console.error('Failed to run tests');
-        process.exit(1);
+        console.error('Failed to run tests', err);
+        process.exitCode = 1;
+    }
+    finally {
+        await (0, promises_1.rm)(profile, { recursive: true, force: true });
     }
 }
 main();

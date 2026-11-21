@@ -1,11 +1,11 @@
-import { Diagnostic, DiagnosticSeverity, TextDocument } from 'vscode-languageserver';
+import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
 import { TextDocument as LSDocument } from 'vscode-languageserver-textdocument';
-import { LintErrorCode } from '../shared/types';
+import { AnalysisOptions, analyzeContracts } from './contracts';
 
 export class GASD12LintEngine {
     
     // Core Evaluator #US-39, triggers #US-30, #US-31, #US-33
-    public validateDocument(document: LSDocument): Diagnostic[] {
+    public validateDocument(document: LSDocument, readImport?: AnalysisOptions['readImport']): Diagnostic[] {
         const text = document.getText();
         const diagnostics: Diagnostic[] = [];
 
@@ -93,6 +93,6 @@ export class GASD12LintEngine {
             diagnostics.push(diagnostic);
         }
 
-        return diagnostics;
+        return diagnostics.concat(analyzeContracts(text, { uri: document.uri, readImport }).diagnostics);
     }
 }

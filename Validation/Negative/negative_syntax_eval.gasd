@@ -18,7 +18,7 @@ COMPONENT NegativeValidator:
         validate_failures() -> Boolean
 
 FLOW validate_negative_scenarios():
-    @trace("#US-41") AS TR_NEG_VAL
+    @trace("US-41") AS TR_NEG_VAL
     1. ACHIEVE "Load malformed GASD 1.2 syntax"
         POSTCONDITION: result != null
     2. MATCH "Lexer Output":
@@ -31,3 +31,15 @@ FLOW validate_negative_scenarios():
         DEFAULT -> THROW "GEP-6 POSTCONDITION Rule Failed"
     5. VALIDATE "Syntax is explicitly rejected when failing GEP-5 (VALIDATE without AS TYPE)" AS TYPE.Requirement
     6. RETURN "Success"
+
+FLOW reject_invalid_contracts():
+    1. ENSURE "Missing and empty BEHAVIORS and empty, guard-only, and timing-only cases each report LINT-007" @trace("NT-GEP7-001") AS TR_NO_OUTCOMES
+        OTHERWISE THROW NegativeTestFailure
+    2. ENSURE "Reject duplicate inputs, duplicate case names, unresolved interface methods, and mismatches in parameter count, order, types, or output" @trace("NT-GEP7-002") AS TR_INVALID_SIGNATURE
+        OTHERWISE THROW NegativeTestFailure
+    3. ENSURE "Reject undeclared guard values and fields, outcome bindings in guards, comparisons with incompatible types, nonnumeric ordering, and guards after case clauses" @trace("NT-GEP7-003") AS TR_INVALID_GUARD
+        OTHERWISE THROW NegativeTestFailure
+    4. ENSURE "Reject repeated THROWS and AFTER clauses, and negative, fractional, or nonnumeric retry counts"
+        OTHERWISE THROW NegativeTestFailure
+    5. ENSURE "A reached guard with a missing argument is a verification error. An unavailable result or error binding rules out the case"
+        OTHERWISE THROW NegativeTestFailure

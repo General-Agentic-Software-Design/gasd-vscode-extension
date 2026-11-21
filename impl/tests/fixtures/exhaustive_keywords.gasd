@@ -28,14 +28,19 @@ TYPE Order @status("DRAFT"):
     items: List<Any>
     metadata: Map<String, String>
 
+COMPONENT PaymentService:
+    INTERFACE:
+        charge(amount: Decimal, currency: String) -> Result<Void>
+
 CONTRACT PaymentService.charge:
     INPUT: amount: Decimal, currency: String
     OUTPUT: Result<Void>
     BEHAVIORS:
         CASE success:
+            WHEN: amount > 0
             POSTCONDITION: result IS Void
         CASE failure:
-            THROWS: "PaymentError"
+            THROWS: PaymentError
             AFTER: 3000ms
     IDEMPOTENT: true
 

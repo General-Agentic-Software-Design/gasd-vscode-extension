@@ -18,7 +18,7 @@ COMPONENT RegressionValidator:
         validate_compatibility() -> Boolean
 
 FLOW validate_regression_suite():
-    @trace("#US-40") AS TR_REG_VAL
+    @trace("US-40") AS TR_REG_VAL
     1. ACHIEVE "Load GASD 1.1 file without VERSION directive"
         POSTCONDITION: result != null
     2. ACHIEVE "Run gasd parser in 1.2 mode"
@@ -28,3 +28,13 @@ FLOW validate_regression_suite():
     5. ACHIEVE "Assert parsing terminates gracefully on all 1.1 designs"
         POSTCONDITION: result != null
     6. RETURN "Success"
+
+FLOW validate_contract_regressions():
+    1. ACHIEVE "Run gasd_parser with GASD 1.2 over the 31 upstream examples and inspect each reported file status" @trace("RT-GEP7-001") AS TR_EXAMPLE_BASELINE
+        POSTCONDITION: result == 31
+    2. ENSURE "The inventory release_stock AST preserves released and failed cases with result == void and error != null respectively" @trace("RT-GEP7-002") AS TR_RELEASE_CASES
+        OTHERWISE THROW RegressionFailure
+    3. ENSURE "A success observation without independent stock evidence is unverified, while a repeated release with unchanged stock satisfies the quoted postcondition"
+        OTHERWISE THROW RegressionFailure
+    4. ENSURE "An unguarded case remains eligible for all input. VERSION 1.1 files retain their existing diagnostic behavior"
+        OTHERWISE THROW RegressionFailure

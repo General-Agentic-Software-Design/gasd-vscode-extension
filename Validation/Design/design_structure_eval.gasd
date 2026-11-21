@@ -7,41 +7,39 @@ CONTEXT: "VS Code Extension Validation"
 TARGET: "GASD AST"
 TRACE: "#US-1-TO-41"
 
-IMPORT "design/lsp_server.gasd" AS ServerDesign
-IMPORT "design/extension_client.gasd" AS ClientDesign
-IMPORT "design/types.gasd" AS TypesDesign
-IMPORT "design/vscode_gasd_extension.gasd" AS ExtensionDesign
+IMPORT "../../design/lsp_server.gasd" AS ServerDesign
+IMPORT "../../design/extension_client.gasd" AS ClientDesign
+IMPORT "../../design/types.gasd" AS TypesDesign
+IMPORT "../../design/vscode_gasd_extension.gasd" AS ExtensionDesign
 
-CONTRACT ServerDesign:
-    INPUT: ast: Any
-    OUTPUT: Boolean
+CONTRACT ServerDesign.ContractAnalyzer.parse_contracts:
+    INPUT: content: String
+    OUTPUT: List<TypesDesign.ContractDefinition>
     BEHAVIORS:
         CASE success:
             POSTCONDITION: result != null
     VERSION: "1.2.0"
 
-CONTRACT ClientDesign:
-    INPUT: ast: Any
-    OUTPUT: Boolean
+CONTRACT ClientDesign.ExtensionClient.deactivate:
+    OUTPUT: Void
+    BEHAVIORS:
+        CASE success:
+            POSTCONDITION: result == void
+    VERSION: "1.2.0"
+
+CONTRACT TypesDesign.ContractSyntax.parse_contracts:
+    INPUT: content: String
+    OUTPUT: List<TypesDesign.ContractDefinition>
     BEHAVIORS:
         CASE success:
             POSTCONDITION: result != null
     VERSION: "1.2.0"
 
-CONTRACT TypesDesign:
-    INPUT: ast: Any
-    OUTPUT: Boolean
+CONTRACT ExtensionDesign.GASDExtension.on_startup:
+    OUTPUT: Void
     BEHAVIORS:
         CASE success:
-            POSTCONDITION: result != null
-    VERSION: "1.2.0"
-
-CONTRACT ExtensionDesign:
-    INPUT: ast: Any
-    OUTPUT: Boolean
-    BEHAVIORS:
-        CASE success:
-            POSTCONDITION: result != null
+            POSTCONDITION: result == void
     VERSION: "1.2.0"
 
 NAMESPACE: "gasd.vscode.validation.design"
@@ -55,7 +53,7 @@ COMPONENT DesignStructureValidator:
         validate_architecture() -> Boolean
 
 FLOW validate_design_architecture():
-    @trace("#US-1 to #US-41") AS TR_DESIGN_VAL
+    @trace("US-1-to-US-41") AS TR_DESIGN_VAL
     1. ACHIEVE "Load design GASD ASTs"
         POSTCONDITION: result != null
     2. VALIDATE "ASTs contain COMPONENT and INTERFACE blocks" AS TYPE.Requirement
@@ -66,3 +64,14 @@ FLOW validate_design_architecture():
     6. ACHIEVE "Ensure INVARIANT scopes (LOCAL/GLOBAL) are present per GEP-6"
         POSTCONDITION: result != null
     7. RETURN "Success"
+
+FLOW validate_contract_design():
+    @trace("AT-GEP7-002") AS TR_CONTRACT_AST @trace("AT-GEP7-004") AS TR_CONTRACT_VERIFICATION
+    1. ENSURE "Contract cases model ordered guard nodes, formal and quoted postconditions, and typed timing constraints"
+        OTHERWISE THROW DesignFailure
+    2. ENSURE "The same contract model is shared by editor diagnostics, both AST exports, and the call verifier"
+        OTHERWISE THROW DesignFailure
+    3. ENSURE "Call guards can be evaluated independently before argument validation and invocation"
+        OTHERWISE THROW DesignFailure
+    4. ENSURE "The client routes an observed call plus its active document URI to the validator and displays its status"
+        OTHERWISE THROW DesignFailure

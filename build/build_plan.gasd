@@ -159,8 +159,7 @@ FLOW phase4_generate_implementation():
         OTHERWISE THROW "Implementation Quality Gate Failed: Incomplete or Unfaithful Execution"
 
 // ===================================================================
-// PHASE 5 — Full Quality Gate [COMPLETED]
-// All tests passed (41/41) with 100% requirements coverage.
+// PHASE 5 — Full Quality Gate
 // ===================================================================
 
 FLOW phase5_full_quality_gate():
@@ -172,7 +171,7 @@ FLOW phase5_full_quality_gate():
             result == "Passed"
     3. ENSURE "All categories of tests specified in Phase 3 pass with 100% success rate mapping all requirements" @trace("#US-1 to #US-41") AS TR_QG_PASS
         OTHERWISE THROW "Build Failure: Quality Gate Failed"
-    4. LOG "Phase 5 passed: 41/41 tests green."
+    4. LOG "Phase 5 test results recorded."
 
 // ===================================================================
 // PHASE 6 — Final Packaging (Output: build/installation/ folder)
@@ -185,7 +184,7 @@ FLOW phase6_final_packaging():
             "build/installation/ is empty" IS String
     2. ACHIEVE "Run packaging script: cd impl && ./package.sh"
         POSTCONDITION:
-            "build/installation/vscode-gasd-1.2.0.vsix exists" IS String
+            "build/installation/vscode-gasd-1.2.1.vsix exists" IS String
     3. ENSURE "VSIX package contains all resources (icons, grammars, snippets, icons/gasd_icon.png)" @trace("#AC-27.2") AS TR_PKG_27_2
         OTHERWISE THROW "Packaging Missing Resources"
     4. ACHIEVE "Perform top-to-bottom validation of all project artifacts"
@@ -194,5 +193,5 @@ FLOW phase6_final_packaging():
     5. ACHIEVE "Final distribution passes all basic functionality smoke tests"
         POSTCONDITION:
             "Smoke tests passed" IS String
-    6. LOG "GASD Extension 1.2.0 packaged successfully"
+    6. LOG "GASD Extension 1.2.1 packaged successfully"
 
