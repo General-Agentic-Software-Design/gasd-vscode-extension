@@ -1,22 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkFlowSignature = checkFlowSignature;
 exports.parseContractDocument = parseContractDocument;
 exports.isCaseClauseLine = isCaseClauseLine;
 const node_crypto_1 = require("node:crypto");
 const node_1 = require("vscode-languageserver/node");
-const identifier = '[A-Za-z_#][A-Za-z0-9_-]*';
+const source_1 = require("../source");
+const identifier = source_1.nameSegment;
 const qualifiedName = `${identifier}(?:\\.${identifier})*`;
 const namePattern = new RegExp(`^${qualifiedName}$`);
 const comparisonPattern = /^(==|!=|>=|<=|>|<|IS)$/;
 const tokensPattern = new RegExp(`"(?:[^"\\\\]|\\\\.)*"|${qualifiedName}|\\d+(?:\\.\\d+)?|==|!=|>=|<=|->|[+*/^<>()@,:-]`, 'gy');
-function stringValue(token) {
-    try {
-        return JSON.parse(token);
-    }
-    catch {
-        return token.slice(1, -1).replace(/\\(["\\])/g, '$1');
-    }
-}
 class Tokens {
     index = 0;
     tokens = [];
@@ -74,7 +68,7 @@ class Tokens {
         if (name === 'Enum' && this.accept('(')) {
             const values = [];
             do {
-                values.push(this.peek().startsWith('"') ? stringValue(this.take()) : this.name());
+                values.push(this.peek().startsWith('"') ? (0, source_1.stringValue)(this.take()) : this.name());
             } while (this.accept(','));
             this.expect(')');
             return { kind: 'enum', values };
@@ -119,7 +113,7 @@ class Tokens {
     operand(formal) {
         const token = this.peek();
         if (token.startsWith('"'))
-            return { kind: 'literal', value: stringValue(this.take()) };
+            return { kind: 'literal', value: (0, source_1.stringValue)(this.take()) };
         if (/^\d/.test(token) || token === '-') {
             const sign = this.accept('-') ? '-' : '';
             const number = this.take();
@@ -174,27 +168,30 @@ class Tokens {
         return args;
     }
 }
-function uncomment(source) {
-    // Preserve offsets while removing comments, leaving quoted comment markers intact.
-    return source.replace(/"(?:[^"\\\r\n]|\\.)*"|\/\*[\s\S]*?(?:\*\/|$)|\/\/[^\r\n]*/g, part => part.startsWith('"') ? part : part.replace(/[^\r\n]/g, ' '));
-}
-function lineTree(source) {
-    const roots = [];
-    const stack = [];
-    uncomment(source).split(/\r?\n/).forEach((raw, index) => {
-        const text = raw.trim();
-        if (text === '')
-            return;
-        const start = raw.search(/\S/);
-        const indent = raw.slice(0, start).replace(/\t/g, '    ').length;
-        const line = { text, indent, range: node_1.Range.create(index, start, index, raw.trimEnd().length), children: [] };
-        while (stack.length && stack[stack.length - 1].indent >= indent)
-            stack.pop();
-        const parent = stack[stack.length - 1];
-        (parent ? parent.children : roots).push(line);
-        stack.push(line);
-    });
-    return roots;
+function checkFlowSignature(source) {
+    try {
+        const tokens = new Tokens(source);
+        tokens.expect('(');
+        const parameters = tokens.parameterList(')');
+        if (new Set(parameters.map(parameter => parameter.name)).size !== parameters.length) {
+            return 'Parameter names must be unique.';
+        }
+        tokens.expect(')');
+        if (tokens.accept('->'))
+            tokens.type();
+        while (tokens.accept('@')) {
+            tokens.name();
+            if (tokens.accept('('))
+                tokens.callArguments();
+            if (tokens.accept('AS'))
+                tokens.name();
+        }
+        tokens.expect(':');
+        tokens.done();
+    }
+    catch (error) {
+        return error.message;
+    }
 }
 function parseCase(line, report) {
     const match = new RegExp(`^CASE\\s+(${qualifiedName})\\s*:$`).exec(line.text);
@@ -243,7 +240,7 @@ function parseCase(line, report) {
                     throw new Error('Expected a duration or retry(n) with a nonnegative integer.');
             }
             else if (key === 'POSTCONDITION' && /^"(?:[^"\\]|\\.)*"$/.test(source)) {
-                result.postconditions.push({ kind: 'evidence', text: stringValue(source), source, range: clause.range });
+                result.postconditions.push({ kind: 'evidence', text: (0, source_1.stringValue)(source), source, range: clause.range });
             }
             else {
                 const tokens = new Tokens(source);
@@ -332,7 +329,7 @@ function parseContract(line, name, report) {
                 const version = tokens.take();
                 if (!version.startsWith('"'))
                     throw new Error('Expected a quoted version.');
-                contract.version = stringValue(version);
+                contract.version = (0, source_1.stringValue)(version);
             }
             tokens.done();
         }
@@ -353,16 +350,16 @@ function lastLine(line) {
     return line;
 }
 function parseContractDocument(source, uri, declarationsOnly = false) {
-    const roots = lineTree(source);
+    const roots = (0, source_1.lineTree)(source);
     const is12 = roots.some(line => /^VERSION\s+1\.2(?:\.\d+)?$/.test(line.text));
     const document = { uri, is12, imports: [], methods: [], types: new Map(), contracts: [], diagnostics: [] };
     const report = (line, message, code = 'contract-syntax') => document.diagnostics.push({
         range: line.range, severity: node_1.DiagnosticSeverity.Error, source: 'GASD 1.2', message, code,
     });
     for (const line of roots) {
-        const importMatch = new RegExp(`^IMPORT\\s+("(?:[^"\\\\]|\\\\.)*")(?:\\s+AS\\s+(${identifier}))?$`).exec(line.text);
-        if (importMatch) {
-            document.imports.push({ path: stringValue(importMatch[1]), alias: importMatch[2] });
+        const imported = (0, source_1.parseSourceImport)(line.text);
+        if (imported) {
+            document.imports.push(imported);
             continue;
         }
         const declaration = new RegExp(`^(TYPE|COMPONENT|CONTRACT)\\s+(${qualifiedName})(?=\\s|:|$)`).exec(line.text);
@@ -412,7 +409,7 @@ function parseContractDocument(source, uri, declarationsOnly = false) {
     return document;
 }
 function isCaseClauseLine(source, target) {
-    const lines = uncomment(source).split(/\r?\n/);
+    const lines = (0, source_1.uncomment)(source).split(/\r?\n/);
     if (!lines.some(line => /^VERSION\s+1\.2(?:\.\d+)?\s*$/.test(line)))
         return false;
     const clauses = [/^CASE\s+[^:]+:\s*$/, /^BEHAVIORS\s*:\s*$/, /^CONTRACT\s+[^:]+:\s*$/];

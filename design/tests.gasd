@@ -57,6 +57,17 @@ COMPONENT AcceptanceTestSuite @trace("US-1-TO-27") AS TRACE_US_1_TO_27:
         test_gasd12_required_outcomes() -> Void @trace("NT-GEP7-001") AS TRACE_GEP7_OUTCOMES
         test_gasd12_mismatched_signatures() -> Void @trace("NT-GEP7-002") AS TRACE_GEP7_MISMATCH
         test_gasd12_invalid_guards() -> Void @trace("NT-GEP7-003") AS TRACE_GEP7_INVALID_GUARDS
+        test_entrypoint_editor_and_ast() -> Void @trace("AT-GEP8-001") AS TRACE_GEP8_EDITOR
+        test_entrypoint_flow_order() -> Void @trace("AT-GEP8-002") AS TRACE_GEP8_FLOW_ORDER
+        test_executable_import_closure() -> Void @trace("AT-GEP8-003") AS TRACE_GEP8_IMPORTS
+        test_absent_executable_entrypoint() -> Void @trace("AT-GEP8-005") AS TRACE_GEP8_ABSENT
+        test_entrypoint_typed_flow() -> Void @trace("AT-GEP8-006") AS TRACE_GEP8_TYPED
+        test_documents_without_entrypoint() -> Void @trace("RT-GEP8-001") AS TRACE_GEP8_COMPAT
+        test_invalid_local_entrypoints() -> Void @trace("NT-GEP8-001") AS TRACE_GEP8_LOCAL
+        test_duplicate_executable_entrypoints() -> Void @trace("NT-GEP8-004") AS TRACE_GEP8_DUPLICATE
+        test_native_name_handoff() -> Void @trace("AT-GEP8-004") AS TRACE_GEP8_NATIVE_NAME @trace("AT-GEP8-007") AS TRACE_GEP8_COLLISION
+        test_script_and_binding_handoff() -> Void @trace("AT-GEP8-008") AS TRACE_GEP8_SCRIPT @trace("AT-GEP8-009") AS TRACE_GEP8_BINDINGS
+        test_target_validation_handoff() -> Void @trace("NT-GEP8-005") AS TRACE_GEP8_NO_EXECUTABLE @trace("NT-GEP8-006") AS TRACE_GEP8_UNSUPPORTED
 
 // --- Flows ---
 
@@ -91,6 +102,7 @@ FLOW verify_linting_and_fixes(uri: String):
 
 // --- Constraints ---
 INVARIANT LOCAL: "Expert Compliance: Tests must run in a clean VS Code instance (Insiders/VSC-Test)."
+INVARIANT LOCAL: "For GEP-8 generation scenarios, extension tests verify the resolved source identity passed to target tools. Native code emission and runtime conformance are responsibilities of those tools."
 
 // ===================================================================
 // GASD 1.2 Test Flows — GEP-6 Verification

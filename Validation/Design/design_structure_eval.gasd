@@ -75,3 +75,13 @@ FLOW validate_contract_design():
         OTHERWISE THROW DesignFailure
     4. ENSURE "The client routes an observed call plus its active document URI to the validator and displays its status"
         OTHERWISE THROW DesignFailure
+
+FLOW validate_entrypoint_design():
+    1. ENSURE "Each directive keeps its original spelling and source range, and the resolved identity includes both directive and FLOW locations" @trace("AT-GEP8-001") AS TR_ENTRYPOINT_AST
+        OTHERWISE THROW DesignFailure
+    2. ENSURE "The explicit executable request accepts source URIs and an AST export flag. Its import traversal preserves local editor content and counts canonical documents once" @trace("AT-GEP8-003") AS TR_EXECUTABLE_SOURCES
+        OTHERWISE THROW DesignFailure
+    3. ENSURE "Combined validation and combined AST export apply the same cardinality rule, and no AST is exported with validation errors" @trace("AT-GEP8-005") AS TR_EXECUTABLE_EXPORT
+        OTHERWISE THROW DesignFailure
+    4. ENSURE "The client command validates the active GASD document or explicitly supplied roots. Opening a document alone applies only per-document validation"
+        OTHERWISE THROW DesignFailure

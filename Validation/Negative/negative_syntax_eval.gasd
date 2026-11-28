@@ -43,3 +43,15 @@ FLOW reject_invalid_contracts():
         OTHERWISE THROW NegativeTestFailure
     5. ENSURE "A reached guard with a missing argument is a verification error. An unavailable result or error binding rules out the case"
         OTHERWISE THROW NegativeTestFailure
+
+FLOW reject_invalid_entrypoints():
+    1. ENSURE "Report same-document duplicates even when names match, and reject unknown, ambiguous, case-mismatched, nested, imported-only, quoted, empty, or multiple entry point identifiers" @trace("NT-GEP8-001") AS TR_ENTRYPOINT_LOCAL
+        OTHERWISE THROW NegativeTestFailure
+    2. ENSURE "Reject an ENTRYPOINT before CONTEXT or TARGET and in pre-1.2 files, while ordinary FLOW rules still apply for selected flows"
+        OTHERWISE THROW NegativeTestFailure
+    3. ENSURE "Reject combined executables with two declarations even across omitted, shared, or different namespaces and when names differ. Identify every source file and line and suppress combined AST export" @trace("NT-GEP8-004") AS TR_ENTRYPOINT_COMBINED
+        OTHERWISE THROW NegativeTestFailure
+    4. ENSURE "An unresolved source import fails explicit executable validation rather than hiding a potentially included entry point"
+        OTHERWISE THROW NegativeTestFailure
+    5. ENSURE "Target feasibility remains with the target generator. The editor supplies the resolved document and FLOW even for targets without standalone execution and for launch bindings unresolved at edit time" @trace("NT-GEP8-005") AS TR_EXECUTABLE_TARGET_HANDOFF @trace("NT-GEP8-006") AS TR_UNSUPPORTED_BINDING_HANDOFF
+        OTHERWISE THROW NegativeTestFailure

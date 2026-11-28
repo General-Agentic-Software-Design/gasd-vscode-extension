@@ -48,3 +48,17 @@ FLOW accept_gasd12_contracts():
         OTHERWISE THROW AcceptanceFailure
     5. ENSURE "The editor offers WHEN completion and reports the verified case through GASD: Verify Contract Call"
         OTHERWISE THROW AcceptanceFailure
+
+FLOW accept_gasd12_entrypoints():
+    1. ENSURE "The editor highlights and completes ENTRYPOINT, shows hover and a snippet, corrects keyword casing, suggests local FLOW names and navigates to the declared FLOW. The executable AST retains greet and both source locations" @trace("AT-GEP8-001") AS TR_ENTRYPOINT_EDITOR
+        OTHERWISE THROW AcceptanceFailure
+    2. ENSURE "Two top-level FLOWs may be reordered without changing the selected name" @trace("AT-GEP8-002") AS TR_ENTRYPOINT_ORDER
+        OTHERWISE THROW AcceptanceFailure
+    3. ENSURE "With a sole directive in a transitive import in a different namespace, validate successfully via the executable command and request. Supplying the same file directly, by aliases or paths resolving to the same file, or in a different root order yields the same export. Read open unsaved content" @trace("AT-GEP8-003") AS TR_ENTRYPOINT_IMPORTS
+        OTHERWISE THROW AcceptanceFailure
+    4. ENSURE "Validate and export a multi-file executable without a directive. The result has no startup identity and includes the validated source documents" @trace("AT-GEP8-005") AS TR_ENTRYPOINT_OPTIONAL
+        OTHERWISE THROW AcceptanceFailure
+    5. ENSURE "Select a FLOW with a String parameter and String result without changing ordinary FLOW validation" @trace("AT-GEP8-006") AS TR_ENTRYPOINT_SIGNATURE
+        OTHERWISE THROW AcceptanceFailure
+    6. ENSURE "At the generator boundary, preserve the original FLOW identity for compatible native names, typed flows called by other flows, Python and Node.js script launches, and flows with argument and status constraints" @trace("AT-GEP8-004") AS TR_NATIVE_HANDOFF @trace("AT-GEP8-007") AS TR_NAME_COLLISION_HANDOFF @trace("AT-GEP8-008") AS TR_SCRIPT_HANDOFF @trace("AT-GEP8-009") AS TR_BINDING_HANDOFF
+        OTHERWISE THROW AcceptanceFailure

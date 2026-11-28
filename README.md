@@ -39,8 +39,12 @@ To create a `.vsix` installer for your extension:
 3. Install the generated bundle:
 
     ```bash
-    code --install-extension build/installation/vscode-gasd-1.2.1.vsix
+    code --install-extension build/installation/vscode-gasd-1.2.2.vsix
     ```
+
+## What's New in 1.2.2 (GEP-8)
+
+GASD 1.2 files can declare a startup flow with `ENTRYPOINT`. The extension resolves the local flow and validates entry points across files selected as one executable. [Editor and command usage](impl/README.md#validate-an-executable-entry-point)
 
 ## What's New in 1.2.1 (GEP-7)
 

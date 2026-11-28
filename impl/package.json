@@ -2,7 +2,7 @@
   "name": "vscode-gasd",
   "displayName": "GASD Language Support",
   "description": "Professional language support for General Agentic Software Design (GASD)",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "publisher": "gasd-expert",
   "license": "MIT",
   "repository": {
@@ -22,6 +22,7 @@
     "onCommand:gasd.initializeProject",
     "onCommand:gasd.generateDesign",
     "onCommand:gasd.validateDesign",
+    "onCommand:gasd.validateExecutable",
     "onCommand:gasd.showPreview",
     "onCommand:gasd.requestReview",
     "onCommand:gasd.showStrategyVis",
@@ -70,6 +71,11 @@
         "category": "GASD"
       },
       {
+        "command": "gasd.validateExecutable",
+        "title": "Validate Executable",
+        "category": "GASD"
+      },
+      {
         "command": "gasd.showPreview",
         "title": "GASD: Show Preview",
         "category": "GASD"
@@ -95,6 +101,14 @@
         "category": "GASD"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "gasd.validateExecutable",
+          "when": "resourceExtname == .gasd"
+        }
+      ]
+    },
     "snippets": [
       {
         "language": "gasd",

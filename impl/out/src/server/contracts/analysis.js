@@ -7,6 +7,7 @@ exports.analyzeContracts = analyzeContracts;
 exports.exportContractAst = exportContractAst;
 const node_1 = require("vscode-languageserver/node");
 const syntax_1 = require("./syntax");
+const source_1 = require("../source");
 class ContractScope {
     root;
     readImport;
@@ -17,13 +18,9 @@ class ContractScope {
         this.documents.set(root.uri, root);
     }
     imported(document, path) {
-        let uri;
-        try {
-            uri = new URL(path, document.uri).href;
-        }
-        catch {
+        const uri = (0, source_1.resolveSourceImport)(path, document.uri);
+        if (!uri)
             return undefined;
-        }
         if (!this.documents.has(uri)) {
             const text = this.readImport?.(uri);
             this.documents.set(uri, text === undefined ? undefined : (0, syntax_1.parseContractDocument)(text, uri, true));

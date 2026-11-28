@@ -15,6 +15,14 @@ Professional language support for **General Agentic Software Design (GASD)**.
 2. Open any `.gasd` file to activate the extension.
 3. Use `Cmd+Shift+P` (or `Ctrl+Shift+P`) and search for **"GASD: Initialize Project"** to bootstrap your workspace.
 
+## Validate an executable entry point
+
+In a `VERSION 1.2` file, add `ENTRYPOINT: greet` after `CONTEXT` and `TARGET`. Use the exact name of a top-level `FLOW` in that file. Type `entrypoint` for the snippet. The editor offers local flow names and Go to Definition.
+
+Run **GASD: Validate Executable** to check the active file and its transitive imports. To validate several root files together, select them in the Explorer and run **Validate Executable** from the context menu. The command accepts zero or one declaration across the selected executable and reports conflicting declarations with their file and line.
+
+Tooling can call the language-server request `gasd/validateExecutable` with `{ "uris": ["file:///path/main.gasd"], "exportAST": true }`. The response includes diagnostics and, on success, the entry-point AST nodes and any resolved startup flow with its source location. Target generators use that identity to implement native launch behavior.
+
 ## Verify an observed contract call
 
 Open a `VERSION 1.2` document that declares the contract and run **GASD: Verify Contract Call**. Enter a JSON observation with the contract name, arguments keyed by the contract's `INPUT` names, and the outcome.

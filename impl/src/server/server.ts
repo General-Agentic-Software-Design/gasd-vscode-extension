@@ -1,13 +1,17 @@
 import { readFileSync } from 'node:fs';
 import {
-    CompletionItemKind, createConnection, DocumentSymbol, Hover, InitializeResult, MarkupKind, Position,
-    ProposedFeatures, Range, SymbolKind, TextDocumentSyncKind, TextDocuments, TextEdit,
+    CodeAction, CodeActionKind, CompletionItemKind, createConnection, DocumentSymbol, ErrorCodes, Hover, InitializeResult,
+    MarkupKind, Position, ProposedFeatures, Range, ResponseError, SymbolKind, TextDocumentSyncKind, TextDocuments, TextEdit,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { exportContractAstRequest, verifyContractRequest } from '../shared/contractProtocol';
 import type { ContractCallRequest } from '../shared/contractProtocol';
+import { isExecutableRequest, validateExecutableRequest } from '../shared/executableProtocol';
 import { GASD12LintEngine } from './ValidationEngine';
 import { analyzeContracts, exportContractAst, isCaseClauseLine, verifyContractCall } from './contracts';
+import { entryPointAt, entryPointCaseCode, entryPointCompletions, entryPointHelp, entryPointKeywordRange } from './entrypoint';
+import { validateExecutable } from './executable';
+import { maskStrings, uncomment } from './source';
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
@@ -22,6 +26,7 @@ connection.onInitialize((): InitializeResult => ({
         documentOnTypeFormattingProvider: { firstTriggerCharacter: '\n', moreTriggerCharacter: [':', ' '] },
         hoverProvider: true,
         definitionProvider: true,
+        codeActionProvider: { codeActionKinds: [CodeActionKind.QuickFix] },
         signatureHelpProvider: { triggerCharacters: ['(', ','] },
     },
 }));
@@ -70,7 +75,9 @@ const guardHelp = 'A CASE guard on supplied inputs. All WHEN clauses must preced
 
 connection.onCompletion(({ textDocument, position }) => {
     const document = documents.get(textDocument.uri);
-    if (!document || !isCaseClauseLine(document.getText(), position.line)) return [];
+    if (!document) return [];
+    const entryPointItems = entryPointCompletions(document, position);
+    if (entryPointItems.length || !isCaseClauseLine(document.getText(), position.line)) return entryPointItems;
     const prefix = document.getText(Range.create(position.line, 0, position.line, position.character));
     const match = /^(\s*)(\w*)$/.exec(prefix);
     if (!match || !'WHEN'.startsWith(match[2].toUpperCase())) return [];
@@ -87,13 +94,38 @@ connection.onCompletion(({ textDocument, position }) => {
 
 connection.onHover(({ textDocument, position }): Hover | null => {
     const document = documents.get(textDocument.uri);
-    if (!document || !isCaseClauseLine(document.getText(), position.line)) return null;
+    if (!document) return null;
+    const entrypoint = entryPointKeywordRange(document, position.line);
+    if (entrypoint && position.character <= entrypoint.end.character) {
+        return { range: entrypoint, contents: { kind: MarkupKind.Markdown, value: `**ENTRYPOINT** · ${entryPointHelp}` } };
+    }
+    const text = uncomment(document.getText()).split(/\r?\n/)[position.line] ?? '';
+    const retry = /@retry\b/.exec(maskStrings(text));
+    if (retry && position.character >= retry.index && position.character <= retry.index + retry[0].length) {
+        return { contents: {
+            kind: MarkupKind.Markdown,
+            value: '**@retry(n)**\n\n**Structural** · A retry wrapper is present with count n.\n\n'
+                + '**Runtime** · Injected failures trigger retries.\n\n**Environment** · The operation is idempotent.',
+        } };
+    }
+    if (!isCaseClauseLine(document.getText(), position.line)) return null;
     const start = /^\s*WHEN\b/.exec(document.getText(Range.create(position.line, 0, position.line + 1, 0)));
     if (!start || position.character < start[0].length - 4 || position.character > start[0].length) return null;
     return { contents: { kind: MarkupKind.Markdown, value: `**WHEN** · ${guardHelp}` } };
 });
-connection.onDefinition(() => null);
+connection.onDefinition(({ textDocument, position }) => {
+    const document = documents.get(textDocument.uri);
+    return document ? entryPointAt(document, position) : null;
+});
 connection.onSignatureHelp(() => null);
+connection.onCodeAction(({ textDocument, context }) => context.diagnostics
+    .filter(diagnostic => diagnostic.code === entryPointCaseCode)
+    .map(diagnostic => ({
+        ...CodeAction.create('Change to ENTRYPOINT', { changes: {
+            [textDocument.uri]: [TextEdit.replace(diagnostic.range, 'ENTRYPOINT')],
+        } }, CodeActionKind.QuickFix),
+        diagnostics: [diagnostic],
+    })));
 
 function guardCaseEdit(document: TextDocument, line: number): TextEdit | undefined {
     if (line < 0) return undefined;
@@ -104,19 +136,26 @@ function guardCaseEdit(document: TextDocument, line: number): TextEdit | undefin
     return TextEdit.replace(Range.create(line, start, line, start + 4), 'WHEN');
 }
 
+function keywordCaseEdit(document: TextDocument, line: number): TextEdit | undefined {
+    if (line < 0) return undefined;
+    const entrypoint = entryPointKeywordRange(document, line);
+    if (entrypoint && document.getText(entrypoint) !== 'ENTRYPOINT') return TextEdit.replace(entrypoint, 'ENTRYPOINT');
+    return guardCaseEdit(document, line);
+}
+
 connection.onDocumentFormatting(({ textDocument }) => {
     const document = documents.get(textDocument.uri);
     if (!document) return [];
     const edits: TextEdit[] = [];
     for (let line = 0; line < document.lineCount; line++) {
-        const edit = guardCaseEdit(document, line);
+        const edit = keywordCaseEdit(document, line);
         if (edit) edits.push(edit);
     }
     return edits;
 });
 connection.onDocumentOnTypeFormatting(({ textDocument, position, ch }) => {
     const document = documents.get(textDocument.uri);
-    const edit = document && guardCaseEdit(document, position.line - (ch === '\n' ? 1 : 0));
+    const edit = document && keywordCaseEdit(document, position.line - (ch === '\n' ? 1 : 0));
     return edit ? [edit] : [];
 });
 
@@ -128,6 +167,12 @@ connection.onRequest(verifyContractRequest, ({ uri, call }: { uri: string; call:
 connection.onRequest(exportContractAstRequest, ({ uri, mode }: { uri: string; mode: 'syntax' | 'semantic' }) => {
     const source = readImport(uri);
     return source === undefined ? [] : exportContractAst(source, mode, { uri, readImport });
+});
+connection.onRequest(validateExecutableRequest, (request: unknown) => {
+    if (!isExecutableRequest(request)) {
+        throw new ResponseError(ErrorCodes.InvalidParams, 'Executable validation requires at least one source URI.');
+    }
+    return validateExecutable(request, documents.all(), lintEngine);
 });
 
 documents.listen(connection);

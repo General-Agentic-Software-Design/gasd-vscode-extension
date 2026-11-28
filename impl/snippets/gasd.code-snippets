@@ -4,6 +4,11 @@
         "body": "VERSION 1.2",
         "description": "Declare GASD 1.2"
     },
+    "Executable entry point": {
+        "prefix": "entrypoint",
+        "body": "ENTRYPOINT: ${1:flow_name}",
+        "description": "Select a local startup FLOW in GASD 1.2"
+    },
     "Guarded contract": {
         "prefix": "contract",
         "body": [

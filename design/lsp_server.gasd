@@ -268,3 +268,24 @@ FLOW check_dependency_graph(flow_ast: Types.AST):
         POSTCONDITION:
             result != null
     4. RETURN diagnostics
+
+COMPONENT EntryPointAnalyzer @trace("AT-GEP8-001") AS TRACE_GEP8_AST @trace("AT-GEP8-006") AS TRACE_GEP8_SIGNATURE @trace("NT-GEP8-001") AS TRACE_GEP8_LOCAL:
+    INTERFACE:
+        validate_entrypoint(uri: String, content: String) -> List<Types.Diagnostic>
+        resolve_local(uri: String, content: String) -> Optional<Types.ResolvedEntryPoint>
+        validate_executable(uris: List<String>, exportAST: Boolean) -> Types.ExecutableValidation
+
+FLOW resolve_executable_entrypoint(uris: List<String>, exportAST: Boolean):
+    @trace("AT-GEP8-003") AS TRACE_GEP8_COMBINED @trace("AT-GEP8-005") AS TRACE_GEP8_OPTIONAL @trace("NT-GEP8-004") AS TRACE_GEP8_DUPLICATE
+    1. ACHIEVE "Resolve selected file roots and transitive relative IMPORTs to canonical document identities. Prefer open editor text, report unreadable files, and visit each distinct document once"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Run ordinary document diagnostics and retain every top-level ENTRYPOINT occurrence with its URI and range. Ignore comments, strings, and ENTRYPOINT used as a soft identifier inside other declarations"
+        POSTCONDITION: result != null
+    3. ACHIEVE "Validate each declaration for VERSION 1.2, placement after CONTEXT and TARGET, and one unquoted GASD identifier. Match the exact case-sensitive name of exactly one top-level FLOW in the same document independently of flow order and signature"
+        POSTCONDITION: result != null
+    4. ACHIEVE "If more than one declaration exists, report every declaration location through executable diagnostics independently of namespaces or whether names match"
+        POSTCONDITION: result != null
+    5. ACHIEVE "On successful executable validation, return the resolved startup identity or null. When export is requested, include the entry point nodes and resolved flow location in a combined AST projection ordered by canonical document URI"
+        POSTCONDITION: result != null
+
+INVARIANT LOCAL: "Document editing validates local declarations independently. The combined entry point limit runs only for an explicitly selected executable."

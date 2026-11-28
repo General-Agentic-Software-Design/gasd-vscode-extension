@@ -62,7 +62,14 @@ DECISION "GEP-7 Contract Verification" @trace("AT-GEP7-002") AS TRACE_GEP7_AST:
     ALTERNATIVES: ["Static syntax checks only"]
     AFFECTS: [Server.ContractAnalyzer, Server.ContractVerifier, Client.ExtensionClient]
 
+DECISION "GEP-8 Executable Validation" @trace("AT-GEP8-003") AS TRACE_GEP8_SCOPE:
+    CHOSEN: "The language server resolves startup identity and optionally exports entry point nodes for an explicitly selected executable"
+    RATIONALE: "A workspace may contain several unrelated executables, and a target generator needs the GASD name and declaring document before it applies target naming and launch rules"
+    ALTERNATIVES: ["Apply one entry point limit to the whole workspace"]
+    AFFECTS: [Server.EntryPointAnalyzer]
+
 INVARIANT LOCAL: "TextMate highlighting, completion, hover, and keyword case correction recognize WHEN within GASD 1.2 contract cases."
+INVARIANT LOCAL: "The extension provides entry point authoring and validation. Target generators use the resolved reference and own standalone compatibility, launch bindings, and native code emission."
 
 // --- Global Invariants ---
 INVARIANT GLOBAL: "Expert Compliance: All components MUST trace back to #US or #AC identifiers."

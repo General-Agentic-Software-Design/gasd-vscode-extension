@@ -38,3 +38,10 @@ FLOW validate_contract_regressions():
         OTHERWISE THROW RegressionFailure
     4. ENSURE "An unguarded case remains eligible for all input. VERSION 1.1 files retain their existing diagnostic behavior"
         OTHERWISE THROW RegressionFailure
+
+FLOW validate_entrypoint_regressions():
+    @trace("RT-GEP8-001") AS TR_ENTRYPOINT_REGRESSION
+    1. ENSURE "Existing GASD 1.2 documents without ENTRYPOINT retain their document diagnostics. An entry-point-free multi-file library design passes without an implicit main selection"
+        OTHERWISE THROW RegressionFailure
+    2. ENSURE "GASD 1.1 documents without ENTRYPOINT remain valid. Comments, strings, and ENTRYPOINT in unambiguous identifier positions do not count as declarations"
+        OTHERWISE THROW RegressionFailure

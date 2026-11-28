@@ -5,14 +5,13 @@ VERSION 1.2
    Strictly follows GASD 1.2.0 normative specification.
 */
 
-NAMESPACE: "GASD-Extension-Project"
-
 CONTEXT: "Professional GASD Language Support for VS Code"
 TARGET: "TypeScript 5.x", "VS Code API ^1.80.0"
+NAMESPACE: "GASD-Extension-Project"
 TRACE: "#US-1 to #US-41"
 
 CONSTRAINT: "GASD agent MUST only execute one phase and pause by default, unless explicitly instructed by a human."
-CONSTRAINT: "GASD agent MUST read and master 'Requirments/GASD-Specs/GASD-1.2/GASD_Specification.md' to become an expert before generating any GASD files."
+CONSTRAINT: "GASD agent MUST read and master 'GASDSpecs/GASD-1.2/GASD_Specification.md' before generating any GASD files."
 
 // ===================================================================
 // Constraints
@@ -20,7 +19,7 @@ CONSTRAINT: "GASD agent MUST read and master 'Requirments/GASD-Specs/GASD-1.2/GA
 INVARIANT LOCAL: "The extension must load in less than 500ms"
 INVARIANT LOCAL: "Syntax highlighting must be implemented via TextMate grammar"
 INVARIANT LOCAL: "Zero-dependency installation: VSIX must be self-contained"
-INVARIANT LOCAL: "Agent Compliance: Generated code MUST follow GASD expert patterns." @trace("#US-28") AS TR_AGENT_COMP
+INVARIANT LOCAL: "Agent Compliance: Generated code MUST follow GASD expert patterns for #US-28."
 
 // ===================================================================
 // PHASE 1 — Design (Output: design/ folder)
@@ -28,13 +27,13 @@ INVARIANT LOCAL: "Agent Compliance: Generated code MUST follow GASD expert patte
 // ===================================================================
 
 FLOW phase1_generate_design():
-    1. ACHIEVE "Read Requirments/user-story.md"
+    1. ACHIEVE "Read Requirments/ver-1.1/user-story.md"
         POSTCONDITION:
             result IS String
-    2. ACHIEVE "Read Requirments/gasd-1.1-user-story.md"
+    2. ACHIEVE "Read Requirments/ver-1.1/gasd-1.1-user-story.md"
         POSTCONDITION:
             result IS String
-    3. ACHIEVE "Read Requirments/ver-1.2/user-story.md"
+    3. ACHIEVE "Read Requirments/ver-1.2/user-story.md and the applicable versioned GEP"
         POSTCONDITION:
             result IS String
     4. ENSURE "All #US, #AC, #AT, #RT IDs are extracted from all versioned requirement files"
@@ -93,7 +92,7 @@ FLOW phase2_generate_validations():
 
 // ===================================================================
 // PHASE 3 — Testing (Output: impl/tests/ folder)
-// Generate all acceptance and regression tests, then run to pass.
+// Verify the baseline, then add and verify the new tests before implementation.
 // ===================================================================
 
 FLOW phase3_generate_tests():
@@ -106,33 +105,33 @@ FLOW phase3_generate_tests():
     3. ENSURE "Generated tests are real VS Code / Mocha functional implementations, not assert.ok(true) stubs"
         OTHERWISE THROW "Design Violation: Empty Stubs Generated"
     // --- Backward Compatibility Gate ---
-    3. ENSURE "All existing tests pass unmodified before any new test generation"
+    4. ENSURE "All existing tests pass unmodified before any new test generation"
         OTHERWISE THROW "Regression Detected: Existing Tests Failed"
 
     // --- Acceptance Tests (Playwright-VSCode) ---
-    4. ACHIEVE "Generate comprehensive impl/tests/acceptance/ from Validation/Acceptance/" @trace("#US-1 to #US-41") AS TR_ACC_TESTS
+    5. ACHIEVE "Generate comprehensive impl/tests/acceptance/ from Validation/Acceptance/" @trace("#US-1 to #US-41") AS TR_ACC_TESTS
         POSTCONDITION:
             "impl/tests/acceptance/ exists" IS String
-    5. ENSURE "All AC and AT from Validation/Acceptance/ are covered by acceptance tests"
+    6. ENSURE "All AC and AT from Validation/Acceptance/ are covered by acceptance tests"
         OTHERWISE THROW "Testing Coverage Gap Detected: Acceptance"
 
     // --- Regression & Unit Tests (Mocha) ---
-    6. ACHIEVE "Generate comprehensive impl/tests/regression/ and unit tests from Validation/Regression/" @trace("#US-1 to #US-41") AS TR_REG_TESTS
+    7. ACHIEVE "Generate comprehensive impl/tests/regression/ and unit tests from Validation/Regression/" @trace("#US-1 to #US-41") AS TR_REG_TESTS
         POSTCONDITION:
             "impl/tests/regression/ exists" IS String
-    7. ENSURE "All RT from Validation/Regression/ are covered by regression tests"
+    8. ENSURE "All RT from Validation/Regression/ are covered by regression tests"
         OTHERWISE THROW "Testing Coverage Gap Detected: Regression"
 
     // --- Negative Tests ---
-    8. ACHIEVE "Add exhaustive negative testing suite from Validation/Negative/ covering spec constraints" @trace("#US-1 to #US-41") AS TR_NEG_TESTS
+    9. ACHIEVE "Add exhaustive negative testing suite from Validation/Negative/ covering spec constraints" @trace("#US-1 to #US-41") AS TR_NEG_TESTS
         POSTCONDITION:
             "Negative tests exist" IS String
-    9. ENSURE "Negative tests from Validation/Negative/ correctly trigger and validate expected failures"
+    10. ENSURE "Negative tests from Validation/Negative/ correctly trigger and validate expected failures"
         OTHERWISE THROW "Negative Testing Failure"
 
-    10. ENSURE "100% Traceability and Coverage for all AC, AT, and RT"
+    11. ENSURE "100% Traceability and Coverage for all AC, AT, and RT"
         OTHERWISE THROW "Testing Coverage Gap Detected"
-    11. ENSURE "All steps 1-10 are completed correctly, faithfully, and thoroughly"
+    12. ENSURE "All steps 1-11 are completed correctly, faithfully, and thoroughly"
         OTHERWISE THROW "Testing Quality Gate Failed: Incomplete or Unfaithful Execution"
 
 // ===================================================================
@@ -184,7 +183,7 @@ FLOW phase6_final_packaging():
             "build/installation/ is empty" IS String
     2. ACHIEVE "Run packaging script: cd impl && ./package.sh"
         POSTCONDITION:
-            "build/installation/vscode-gasd-1.2.1.vsix exists" IS String
+            "build/installation contains the VSIX for the version in impl/package.json" IS String
     3. ENSURE "VSIX package contains all resources (icons, grammars, snippets, icons/gasd_icon.png)" @trace("#AC-27.2") AS TR_PKG_27_2
         OTHERWISE THROW "Packaging Missing Resources"
     4. ACHIEVE "Perform top-to-bottom validation of all project artifacts"
@@ -193,5 +192,5 @@ FLOW phase6_final_packaging():
     5. ACHIEVE "Final distribution passes all basic functionality smoke tests"
         POSTCONDITION:
             "Smoke tests passed" IS String
-    6. LOG "GASD Extension 1.2.1 packaged successfully"
+    6. LOG "GASD Extension packaged successfully"
 

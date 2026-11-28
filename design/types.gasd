@@ -287,3 +287,31 @@ TYPE VersionDirective:
     major: Integer
     minor: Integer
     patch: Optional<Integer>
+
+TYPE EntryPointDeclaration:
+    name: Optional<String>
+    location: Location
+    nameRange: Optional<Range>
+
+TYPE ResolvedEntryPoint:
+    name: String
+    declaration: Location
+    flow: Location
+
+TYPE ExecutableSource:
+    uri: String
+    entrypoints: List<EntryPointDeclaration>
+
+/// Entry-point nodes for the combined executable AST and the resolved startup identity.
+TYPE ExecutableEntryPointAST:
+    documents: List<ExecutableSource>
+    entrypoint: Optional<ResolvedEntryPoint>
+
+TYPE ExecutableDiagnostic:
+    uri: String
+    diagnostic: Diagnostic
+
+TYPE ExecutableValidation:
+    diagnostics: List<ExecutableDiagnostic>
+    entrypoint: Optional<ResolvedEntryPoint>
+    ast: Optional<ExecutableEntryPointAST>

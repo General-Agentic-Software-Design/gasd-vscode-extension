@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver/node';
+import { lineTree, nameSegment, parseSourceImport, SourceLine as Line, stringValue, uncomment } from '../source';
 
-const identifier = '[A-Za-z_#][A-Za-z0-9_-]*';
+const identifier = nameSegment;
 const qualifiedName = `${identifier}(?:\\.${identifier})*`;
 const namePattern = new RegExp(`^${qualifiedName}$`);
 
@@ -50,7 +51,6 @@ export interface Contract {
     range: Range;
     selectionRange: Range;
 }
-interface Line { text: string; indent: number; range: Range; children: Line[] }
 export interface ContractDocument {
     uri: string;
     is12: boolean;
@@ -63,11 +63,6 @@ export interface ContractDocument {
 
 const comparisonPattern = /^(==|!=|>=|<=|>|<|IS)$/;
 const tokensPattern = new RegExp(`"(?:[^"\\\\]|\\\\.)*"|${qualifiedName}|\\d+(?:\\.\\d+)?|==|!=|>=|<=|->|[+*/^<>()@,:-]`, 'gy');
-
-function stringValue(token: string): string {
-    try { return JSON.parse(token) as string; }
-    catch { return token.slice(1, -1).replace(/\\(["\\])/g, '$1'); }
-}
 
 class Tokens {
     private index = 0;
@@ -183,7 +178,7 @@ class Tokens {
         const left = this.arithmetic();
         return comparisonPattern.test(this.peek()) ? this.comparison(left, false) : left;
     }
-    private callArguments(): (Expression | PredicateExpression)[] {
+    callArguments(): (Expression | PredicateExpression)[] {
         if (this.accept(')')) return [];
         const args = [this.argument()];
         while (this.accept(',')) args.push(this.argument());
@@ -204,27 +199,24 @@ class Tokens {
     }
 }
 
-function uncomment(source: string): string {
-    // Preserve offsets while removing comments, leaving quoted comment markers intact.
-    return source.replace(/"(?:[^"\\\r\n]|\\.)*"|\/\*[\s\S]*?(?:\*\/|$)|\/\/[^\r\n]*/g,
-        part => part.startsWith('"') ? part : part.replace(/[^\r\n]/g, ' '));
-}
-
-function lineTree(source: string): Line[] {
-    const roots: Line[] = [];
-    const stack: Line[] = [];
-    uncomment(source).split(/\r?\n/).forEach((raw, index) => {
-        const text = raw.trim();
-        if (text === '') return;
-        const start = raw.search(/\S/);
-        const indent = raw.slice(0, start).replace(/\t/g, '    ').length;
-        const line = { text, indent, range: Range.create(index, start, index, raw.trimEnd().length), children: [] };
-        while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
-        const parent = stack[stack.length - 1];
-        (parent ? parent.children : roots).push(line);
-        stack.push(line);
-    });
-    return roots;
+export function checkFlowSignature(source: string): string | undefined {
+    try {
+        const tokens = new Tokens(source);
+        tokens.expect('(');
+        const parameters = tokens.parameterList(')');
+        if (new Set(parameters.map(parameter => parameter.name)).size !== parameters.length) {
+            return 'Parameter names must be unique.';
+        }
+        tokens.expect(')');
+        if (tokens.accept('->')) tokens.type();
+        while (tokens.accept('@')) {
+            tokens.name();
+            if (tokens.accept('(')) tokens.callArguments();
+            if (tokens.accept('AS')) tokens.name();
+        }
+        tokens.expect(':');
+        tokens.done();
+    } catch (error) { return (error as Error).message; }
 }
 
 function parseCase(line: Line, report: Report): ContractCase | undefined {
@@ -354,9 +346,9 @@ export function parseContractDocument(source: string, uri: string, declarationsO
         range: line.range, severity: DiagnosticSeverity.Error, source: 'GASD 1.2', message, code,
     });
     for (const line of roots) {
-        const importMatch = new RegExp(`^IMPORT\\s+("(?:[^"\\\\]|\\\\.)*")(?:\\s+AS\\s+(${identifier}))?$`).exec(line.text);
-        if (importMatch) {
-            document.imports.push({ path: stringValue(importMatch[1]), alias: importMatch[2] });
+        const imported = parseSourceImport(line.text);
+        if (imported) {
+            document.imports.push(imported);
             continue;
         }
         const declaration = new RegExp(`^(TYPE|COMPONENT|CONTRACT)\\s+(${qualifiedName})(?=\\s|:|$)`).exec(line.text);

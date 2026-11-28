@@ -16,6 +16,7 @@ function runValidation() {
     const rootDir = path.resolve(__dirname, '../../');
     const reqFiles = [
         path.join(rootDir, 'Requirments/ver-1.1/user-story.md'),
+        path.join(rootDir, 'Requirments/ver-1.1/gasd-1.1-user-story.md'),
         path.join(rootDir, 'Requirments/ver-1.2/user-story.md')
     ];
 

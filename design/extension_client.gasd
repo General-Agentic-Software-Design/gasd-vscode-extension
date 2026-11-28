@@ -34,6 +34,7 @@ COMPONENT ExtensionClient @trace("US-15") AS TRACE_US_15 @trace("US-27") AS TRAC
         initialize_lsp_client() -> Void  // Registers for both 'file' and 'untitled' document schemes
         register_commands() -> Void
         verify_contract_call() -> Void @trace("AT-GEP7-004") AS TRACE_GEP7_VERIFY_COMMAND
+        validate_executable() -> Void @trace("AT-GEP8-003") AS TRACE_GEP8_COMMAND
 
 COMPONENT SnippetProvider @trace("US-2") AS TRACE_US_2:
     INTERFACE:
@@ -137,4 +138,13 @@ FLOW verify_contract_observation(uri: String):
     2. ACHIEVE "Forward the document URI and observed call to the language server"
         POSTCONDITION: result != null
     3. ACHIEVE "Show the verification status and matching case names or an actionable verification error"
+        POSTCONDITION: result != null
+
+FLOW support_gasd12_entrypoint(uri: String):
+    @trace("AT-GEP8-001") AS TRACE_GEP8_AUTHORING
+    1. ACHIEVE "Recognize ENTRYPOINT in TextMate, keyword completion, hover, keyword case correction, and a GASD 1.2 directive snippet"
+        POSTCONDITION: result != null
+    2. ACHIEVE "Suggest local FLOW names after ENTRYPOINT and navigate from a valid value to its local FLOW declaration, preserving the exact identifier spelling"
+        POSTCONDITION: result != null
+    3. ACHIEVE "Offer GASD: Validate Executable using the active GASD file or explicit file selections as roots. Report the startup flow or errors with each affected file and line"
         POSTCONDITION: result != null

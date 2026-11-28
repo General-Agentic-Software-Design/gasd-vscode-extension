@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver/node';
 import { Contract, ContractDocument, Expression, Method, TypeExpression, parseContractDocument } from './syntax';
+import { resolveSourceImport } from '../source';
 
 export interface AnalysisOptions {
     uri?: string;
@@ -16,9 +17,8 @@ export class ContractScope {
     }
 
     private imported(document: ContractDocument, path: string): ContractDocument | undefined {
-        let uri: string;
-        try { uri = new URL(path, document.uri).href; }
-        catch { return undefined; }
+        const uri = resolveSourceImport(path, document.uri);
+        if (!uri) return undefined;
         if (!this.documents.has(uri)) {
             const text = this.readImport?.(uri);
             this.documents.set(uri, text === undefined ? undefined : parseContractDocument(text, uri, true));

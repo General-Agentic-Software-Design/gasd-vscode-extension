@@ -39,6 +39,7 @@ const path = __importStar(require("path"));
 const vscode_1 = require("vscode");
 const node_1 = require("vscode-languageclient/node");
 const contractProtocol_1 = require("../shared/contractProtocol");
+const executableProtocol_1 = require("../shared/executableProtocol");
 let client;
 function activate(context) {
     // The server is implemented in node
@@ -80,10 +81,69 @@ function activate(context) {
         }));
     });
     context.subscriptions.push(vscode_1.commands.registerCommand('gasd.verifyContractCall', verifyContractObservation));
+    const executableOutput = vscode_1.window.createOutputChannel('GASD Executable Validation');
+    context.subscriptions.push(executableOutput, vscode_1.commands.registerCommand(executableProtocol_1.validateExecutableCommand, (request, selection) => validateExecutableSources(executableOutput, request, selection)));
     // Start the client. This will also launch the server
     const started = client.start();
     console.log('GASD: Extension Activated');
     return started;
+}
+async function validateExecutableSources(output, request, selection) {
+    const interactive = request === undefined || request instanceof vscode_1.Uri;
+    let params;
+    if ((0, executableProtocol_1.isExecutableRequest)(request)) {
+        params = request;
+    }
+    else if (interactive) {
+        const active = vscode_1.window.activeTextEditor?.document;
+        let files;
+        if (request instanceof vscode_1.Uri)
+            files = selection?.length ? selection : [request];
+        else if (active?.languageId === 'gasd')
+            files = [active.uri];
+        else
+            files = await vscode_1.window.showOpenDialog({
+                canSelectMany: true,
+                filters: { 'GASD source': ['gasd'] },
+                openLabel: 'Validate Executable',
+            });
+        if (!files?.length)
+            return;
+        params = { uris: files.map(uri => uri.toString()) };
+    }
+    else {
+        void vscode_1.window.showErrorMessage('Supply at least one GASD source URI for executable validation.');
+        return;
+    }
+    try {
+        const result = await client.sendRequest(executableProtocol_1.validateExecutableRequest, params);
+        if (interactive) {
+            const errors = result.diagnostics.filter(({ diagnostic }) => diagnostic.severity === 1);
+            if (result.diagnostics.length) {
+                output.clear();
+                for (const { uri, diagnostic } of result.diagnostics) {
+                    const source = vscode_1.Uri.parse(uri);
+                    const line = diagnostic.range.start.line + 1;
+                    const column = diagnostic.range.start.character + 1;
+                    output.appendLine(`${source.scheme === 'file' ? source.fsPath : uri}:${line}:${column}  ${diagnostic.message}`);
+                }
+                output.show(true);
+            }
+            if (errors.length) {
+                void vscode_1.window.showErrorMessage(`GASD executable validation failed with ${errors.length} error(s). See GASD Executable Validation output.`);
+            }
+            else {
+                void vscode_1.window.showInformationMessage(result.entrypoint
+                    ? `GASD executable validated. Entry point is ${result.entrypoint.name}.`
+                    : 'GASD executable validated with no declared entry point.');
+            }
+        }
+        return result;
+    }
+    catch (error) {
+        void vscode_1.window.showErrorMessage(`Could not validate the GASD executable. ${error.message}`);
+        return;
+    }
 }
 async function verifyContractObservation(observation) {
     const document = vscode_1.window.activeTextEditor?.document;
